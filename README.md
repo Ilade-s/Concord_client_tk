@@ -1,2 +1,2 @@
-# Concord_client_tk
-Instant messaging client in tkinter
+# Branche dev
+## Langue : FR
