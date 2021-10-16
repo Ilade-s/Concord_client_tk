@@ -33,6 +33,7 @@ class TopLevel(Tk):
         """
         self.navBar = NavBar(self)
         self.contentFrame = ContentFrame(self)
+        self.bind('<MouseWheel>', self.contentFrame.scroll_msgs)
         self.Menu = MenuBar(self)
         self.config(menu=self.Menu)
 

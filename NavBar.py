@@ -14,10 +14,10 @@ class NavBar(LabelFrame):
         self.place(relx=0, rely=.8, relheight=.2, relwidth=1)
 
     def setup_subframes(self):
-        self.messageFrame = MessageFrame(self)
+        self.infoFrame = InfoFrame(self)
         self.inputFrame = InputFrame(self)
 
-class MessageFrame(Frame):
+class InfoFrame(Frame):
 
     def __init__(self, master) -> None:
         super().__init__(master, background=master['background'],

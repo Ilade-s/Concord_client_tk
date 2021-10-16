@@ -27,8 +27,44 @@ class ContentFrame(Frame):
                         relief=RAISED)
         self.place(relx=0, rely=0, relheight=.8, relwidth=1)
         #self.eventFrame = EventFrame(self)
-        mess1 = MessageTemplate(self)
-        mess2 = MessageTemplate(self, defaultMessage2)
+        self.msgList = []
+        self.rendered_msgs = []
+        self.msgIndex = 0
+        self.__debug_setup()
+        self.render_msgs()
+    
+    def scroll_msgs(self, event):
+        print('scroll')
+        if (event.num == 5 or event.delta == -120) and self.msgIndex < len(self.msgList) - 1:
+            self.msgIndex += 1
+        if (event.num == 4 or event.delta == 120) and self.msgIndex > 0:
+            self.msgIndex -= 1
+        print('index :', self.msgIndex)
+        self.render_msgs()
+
+    def __debug_setup(self):
+        for _ in range(10):
+            self.msgList.append(defaultMessage)
+            self.msgList.append(defaultMessage2)
+    
+    def render_msgs(self):
+        for msg in self.rendered_msgs:
+            msg.destroy()
+        self.rendered_msgs = []
+        
+        nMsgs_renderable = self.get_maxAff()
+        msgs_to_render = self.msgList[self.msgIndex:self.msgIndex + nMsgs_renderable]
+
+        for msg in msgs_to_render:
+            self.rendered_msgs.append(MessageTemplate(self, msg))
+
+    def get_maxAff(self):
+        currentY = self.winfo_height()
+        if currentY != 1:    
+            maxMsgs = currentY // 50
+        else:    
+            maxMsgs = 8
+        return maxMsgs
 
 class MessageTemplate(LabelFrame):
 
