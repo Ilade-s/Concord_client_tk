@@ -18,6 +18,6 @@ class MenuBar(Menu):
         # ajout about
         self.add_command(
             label="About", command=lambda: msgbox.showinfo("About",
-                    f"Concord client v{self.master.version}\nMade by {self.masrter.authors}, 2021 \
-                    \nSource : Assets : https://feathericons.com/ \
+                    f"Concord client v{self.master.version}\nMade by {self.master.authors}, 2021 \
+                    \nSource : https://github.com/Ilade-s/Concord_client_tk \
                     \nAssets : https://feathericons.com/"))

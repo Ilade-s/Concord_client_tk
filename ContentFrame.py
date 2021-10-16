@@ -31,15 +31,12 @@ class ContentFrame(Frame):
         self.rendered_msgs = []
         self.msgIndex = 0
         self.__debug_setup()
-        self.render_msgs()
     
     def scroll_msgs(self, event):
-        print('scroll')
         if (event.num == 5 or event.delta == -120) and self.msgIndex < len(self.msgList) - 1:
             self.msgIndex += 1
         if (event.num == 4 or event.delta == 120) and self.msgIndex > 0:
             self.msgIndex -= 1
-        print('index :', self.msgIndex)
         self.render_msgs()
 
     def __debug_setup(self):
@@ -57,6 +54,8 @@ class ContentFrame(Frame):
 
         for msg in msgs_to_render:
             self.rendered_msgs.append(MessageTemplate(self, msg))
+        
+        self.master.navBar.infoFrame.update_renderLabel(self.msgIndex + 1, len(msgs_to_render) - 1)
 
     def get_maxAff(self):
         currentY = self.winfo_height()

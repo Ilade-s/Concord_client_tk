@@ -21,21 +21,23 @@ class TopLevel(Tk):
     def __init__(self, x=X, y=Y) -> None:
         super().__init__()
         self.version = __VERSION__
+        self.authors = __AUTHORS__
         self.iconphoto(True, PhotoImage(file="assets/logo.png"))
         self.title(
             f"Concord client v{__VERSION__}")
         self.geometry("{}x{}".format(x, y))
-        self.setup_frames()
+        self.__setup_frames()
 
-    def setup_frames(self):
+    def __setup_frames(self):
         """
         Place les Frames dans la grille
         """
-        self.navBar = NavBar(self)
         self.contentFrame = ContentFrame(self)
+        self.navBar = NavBar(self)
         self.bind('<MouseWheel>', self.contentFrame.scroll_msgs)
         self.Menu = MenuBar(self)
         self.config(menu=self.Menu)
+        self.contentFrame.render_msgs()
 
 def main():
     print("===============================================================")
