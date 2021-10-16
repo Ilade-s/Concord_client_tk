@@ -6,6 +6,7 @@ from tkinter import ttk
 # Frames individuelles
 from NavBar import *
 from ContentFrame import *
+from MenuBar import *
 
 __AUTHORS__ = 'Raphaël, Matheo and Alban'
 __VERSION__ = '0.1'
@@ -19,6 +20,7 @@ class TopLevel(Tk):
     """
     def __init__(self, x=X, y=Y) -> None:
         super().__init__()
+        self.version = __VERSION__
         self.iconphoto(True, PhotoImage(file="assets/logo.png"))
         self.title(
             f"Concord client v{__VERSION__}")
@@ -29,9 +31,10 @@ class TopLevel(Tk):
         """
         Place les Frames dans la grille
         """
-        print("Placement Frames...")
         self.navBar = NavBar(self)
         self.contentFrame = ContentFrame(self)
+        self.Menu = MenuBar(self)
+        self.config(menu=self.Menu)
 
 def main():
     print("===============================================================")

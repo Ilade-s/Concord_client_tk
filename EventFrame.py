@@ -22,6 +22,7 @@ class EventFrame(LabelFrame):
             - goal : str : indique le but de la Frame à afficher (et donc les widgets à ajouter):
                 - "connexion" : fenêtre de connexion à un autre client (ip,...)
                 - "log" : fenêtre de récupération des logs
+                - "host": fenêtre pour hosting d'une discussion
         """
         super().__init__(master, background="#FFB8CD",
                          relief=SOLID, text=f"EventFrame : {goal}")
@@ -30,10 +31,15 @@ class EventFrame(LabelFrame):
             self.setup_connexionFrame()
         elif goal == "log":
             self.setup_logFrame()
+        elif goal == "host":
+            self.setup_hostFrame()
         self.pack(anchor="nw", pady=5, padx=20, expand=True, ipadx=300, ipady=100)
     
     def setup_connexionFrame(self):
         pass
 
     def setup_logFrame(self):
+        pass
+    
+    def setup_hostFrame(self):
         pass
