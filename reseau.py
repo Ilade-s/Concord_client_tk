@@ -1,5 +1,6 @@
 import socket
 from threading import Thread #Permet de faire tourner des fonctions en meme temps (async)
+import time
 
 class reseau:
     """
@@ -13,6 +14,7 @@ class reseau:
         self.listclient = []
         self.pseudo = pseudo
         self.waitmessage = []
+        self.chat = {0:0}
 
     def __bind(self,Host,Port, Cons=False):
         """
@@ -51,32 +53,67 @@ class reseau:
             client.close()
         self.sock.close()
 
-    def __SendMessageByHote(self, Cons=False):
+    def __SendMessageByHote(self):
         while self.serveurstart:
-            if self.waitmessage:
-                msg = f"{self.pseudo} >> {self.waitmessage[0]}"
-                codemsg = msg.encode("utf-8")
-                self.waitmessage.pop(0)
-                for client in self.listclient:
-                    client.send(codemsg)
+            if not self.waitmessage:
+                time.sleep(1)
+                continue
+            msg = f"{self.pseudo}§{self.waitmessage[0]}"
+            codemsg = msg.encode("utf-8")
+            self.waitmessage.pop(0)
+            for client in self.listclient:
+                client.send(codemsg)
 
     def SendMessage(self,message,Cons=False):
         if Cons:print(f"{self.pseudo} >> {message}")
         self.waitmessage.append(str(message))
+
+    def __ConsoleUseSend(self):
+        while self.serveurstart:
+            envoie = input(f"--------- SEND >> ")
+            if envoie == "/stop":
+                self.CloseBind()
+            else:
+                self.SendMessage(envoie,True)
+
+    def __GetMessageOfClient(self,client):
+        requete_client = client.recv(500)
+        requete_client = requete_client.decode('utf-8')
+
+        posbreak = requete_client.find("§")
+        pseudo = requete_client[0:posbreak]
+        message = requete_client[posbreak+1:len(requete_client)]
+
+        ID = self.chat[0]+1
+        TIME = time.strftime('%H:%M', time.localtime())
+        self.chat[0] = ID
+        self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message}
+        print(self.chat)
+
+    def __GetAllMessageByServer(self):
+        while self.serveurstart:
+            time.sleep(1)
+            for client in self.listclient:
+                # self.listclient.index(client) = Thread(target=self.__GetMessageOfClient,args=[client])
+                # self.listclient.index(client).start
+                self.__GetMessageOfClient(client)
+
 
     def HostMessagerie(self, Host='localhost', Port=6300, Cons=False):
 
         self.serveurstart = True
         self.__bind(Host,Port,Cons) #Ouverture de la session
         request = Thread(target=self.__RequestClient,args=[Cons])
-        send = Thread(target=self.__SendMessageByHote,args=[Cons])
+        send = Thread(target=self.__SendMessageByHote)
+        get = Thread(target=self.__GetAllMessageByServer)
         request.start()
         send.start()
-        test = input(">")
-        self.SendMessage(test,Cons)
+        get.start()
+        if Cons: #Utiliser si nous voulons lancer le chat via la console
+            console = Thread(target=self.__ConsoleUseSend())
+            console.start()
 
-        
-    
+
     
 
 if __name__ == "__main__":
