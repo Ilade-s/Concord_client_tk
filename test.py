@@ -9,6 +9,7 @@ socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 socket.connect((Host,Port))
 
 while True:
-    requete_server = socket.recv(500)
-    requete_server = requete_server.decode("utf-8")
-    print(requete_server)
+        msg = input()
+        msg = f"HENRI§{msg}"
+        msg = msg.encode('utf-8')
+        socket.send(msg)
