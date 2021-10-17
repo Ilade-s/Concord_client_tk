@@ -16,7 +16,7 @@ defaultMessage = {
 defaultMessage2 = {
     'pseudo': 'You',
     'time': '17:51',
-    'content': 'elo',
+    'content': 'eloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo',
     'distant': False
 }
 
@@ -45,6 +45,13 @@ class ContentFrame(Frame):
             self.msgList.append(defaultMessage2)
     
     def render_msgs(self):
+        def format_content(txt, maxCarac):
+            if len(txt) > maxCarac:
+                return format_content(txt[:maxCarac//2], maxCarac) + '\n' + \
+                        format_content(txt[maxCarac//2:], maxCarac)
+            else: 
+                return txt
+
         for msg in self.rendered_msgs:
             msg.destroy()
         self.rendered_msgs = []
@@ -53,7 +60,9 @@ class ContentFrame(Frame):
         msgs_to_render = self.msgList[self.msgIndex:self.msgIndex + nMsgs_renderable]
 
         for msg in msgs_to_render:
-            self.rendered_msgs.append(MessageTemplate(self, msg))
+            msgc = msg.copy()
+            msgc['content'] = format_content(msgc['content'], self.get_maxCarac())
+            self.rendered_msgs.append(MessageTemplate(self, msgc))
         
         self.master.navBar.infoFrame.update_renderLabel(self.msgIndex + 1, len(msgs_to_render) - 1)
 
@@ -63,6 +72,14 @@ class ContentFrame(Frame):
             maxMsgs = currentY // 50
         else:    
             maxMsgs = 8
+        return maxMsgs
+    
+    def get_maxCarac(self):
+        currentX = self.winfo_width()
+        if currentX != 1:    
+            maxMsgs = currentX // 10
+        else:    
+            maxMsgs = 100
         return maxMsgs
 
 class MessageTemplate(LabelFrame):
