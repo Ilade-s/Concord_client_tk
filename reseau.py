@@ -77,26 +77,33 @@ class reseau:
                 self.SendMessage(envoie,True)
 
     def __GetMessageOfClient(self,client):
-        requete_client = client.recv(500)
-        requete_client = requete_client.decode('utf-8')
+        requete_client = client.recv(500) #Recuperation des messages
+        requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8
 
-        posbreak = requete_client.find("§")
-        pseudo = requete_client[0:posbreak]
-        message = requete_client[posbreak+1:len(requete_client)]
+        #Fractionnage du message
+        posbreak = requete_client_decode.find("§")
+        pseudo = requete_client_decode[0:posbreak]
+        message = requete_client_decode[posbreak+1:len(requete_client_decode)]
 
+        #Stockage du message
         ID = self.chat[0]+1
         TIME = time.strftime('%H:%M', time.localtime())
         self.chat[0] = ID
         self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message}
-        print(self.chat)
+
+        print(f"{pseudo} >> {message}")
+
+        #Envoie du message vers les autres client !
+        for newclient in self.listclient:
+            if newclient != client:
+                newclient.send(requete_client)
 
     def __GetAllMessageByServer(self):
         while self.serveurstart:
             time.sleep(1)
             for client in self.listclient:
-                # self.listclient.index(client) = Thread(target=self.__GetMessageOfClient,args=[client])
-                # self.listclient.index(client).start
-                self.__GetMessageOfClient(client)
+                GetMessage = Thread(target=self.__GetMessageOfClient,args=[client])
+                GetMessage.start()
 
 
     def HostMessagerie(self, Host='localhost', Port=6300, Cons=False):
@@ -112,11 +119,11 @@ class reseau:
         if Cons: #Utiliser si nous voulons lancer le chat via la console
             console = Thread(target=self.__ConsoleUseSend())
             console.start()
-
+        
 
     
 
 if __name__ == "__main__":
     test = reseau()
 
-    test.HostMessagerie("192.168.1.96",5415,True)
+    test.HostMessagerie("172.20.10.2",5415,True)
