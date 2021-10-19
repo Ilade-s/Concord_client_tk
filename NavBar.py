@@ -5,7 +5,7 @@ TODO
 """
 from tkinter import *
 from tkinter import ttk
-from datetime import datetime, time
+from datetime import datetime
 
 class NavBar(LabelFrame):
 
@@ -71,6 +71,7 @@ class InputFrame(Frame):
                 'content': msg.get(),
                 'distant': False
             }
+            self.master.master.log.add_message(msgDict)
             self.master.master.contentFrame.set_new_msg(msgDict)
             # TODO : envoi à la classe de networking
             # reset entry

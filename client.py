@@ -4,9 +4,10 @@ Interface client en tkinter de la messagerie instantanée Concord
 from tkinter import *
 from tkinter import ttk
 # Frames individuelles
-from NavBar import *
-from ContentFrame import *
-from MenuBar import *
+from NavBar import NavBar
+from ContentFrame import ContentFrame
+from MenuBar import MenuBar
+from logHandler import LogHandler
 
 __AUTHORS__ = 'Raphaël, Matheo and Alban'
 __VERSION__ = '0.1'
@@ -23,6 +24,11 @@ class TopLevel(Tk):
         self.version = __VERSION__
         self.authors = __AUTHORS__
         self.pseudo = 'Anon'
+        self.host = False
+        # TEST --------------
+        self.log = LogHandler(self.pseudo, False)
+        self.log.add_member('Pedro', '123.145.156.178')
+        # TEST --------------
         self.iconphoto(True, PhotoImage(file="assets/logo.png"))
         self.title(
             f"Concord client v{__VERSION__}")
