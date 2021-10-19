@@ -14,7 +14,7 @@ defaultMessage = {
     'distant': True
 }
 defaultMessage2 = {
-    'pseudo': 'You',
+    'pseudo': 'Anon',
     'time': '17:51',
     'content': 'eloooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo',
     'distant': False
@@ -32,17 +32,32 @@ class ContentFrame(Frame):
         self.msgIndex = 0
         self.__debug_setup()
     
+    def __debug_setup(self):
+        for _ in range(10):
+            self.msgList.append(defaultMessage)
+            self.msgList.append(defaultMessage2)
+    
+    def show_last_msg(self):
+        """
+        render_msgs which go to the last messages
+        """
+        nMsgs_renderable = self.get_maxAff()
+        self.msgIndex = len(self.msgList) - nMsgs_renderable
+        self.render_msgs()
+    
     def scroll_msgs(self, event):
         if (event.num == 5 or event.delta == -120) and self.msgIndex < len(self.msgList) - 1:
             self.msgIndex += 1
         if (event.num == 4 or event.delta == 120) and self.msgIndex > 0:
             self.msgIndex -= 1
         self.render_msgs()
-
-    def __debug_setup(self):
-        for _ in range(10):
-            self.msgList.append(defaultMessage)
-            self.msgList.append(defaultMessage2)
+    
+    def set_new_msg(self, newmsg):
+        """
+        sends new message and renders it automatically
+        """
+        self.msgList.append(newmsg)
+        self.show_last_msg()
     
     def render_msgs(self):
         def format_content(txt, maxCarac):
@@ -90,7 +105,8 @@ class MessageTemplate(LabelFrame):
         message : dictionnaire qui contient toutes les informations sur le message
         """
         super().__init__(master, background=master['background'], 
-                        text=f"{message['pseudo']} ({message['time']})",
+                        text=f"{message['pseudo']} ({message['time']})" if message['distant'] 
+                            else f"{message['pseudo']} (You) ({message['time']})",
                         relief=RAISED, foreground='white')
         # ajout texte
         ttk.Label(self, text=message['content'], style="Message.TLabel"

@@ -5,6 +5,7 @@ TODO
 """
 from tkinter import *
 from tkinter import ttk
+from datetime import datetime, time
 
 class NavBar(LabelFrame):
 
@@ -36,8 +37,7 @@ class InfoFrame(LabelFrame):
 
         self.renderedMsgsLabel = ttk.Label(self, 
                 text='Messages affichés : /',
-                background=self['background'], style='Info.TLabel'
-                )
+                background=self['background'], style='Info.TLabel')
         
         self.renderedMsgsLabel.pack(padx=2, pady=3)
 
@@ -60,3 +60,36 @@ class InputFrame(Frame):
         super().__init__(master, background=master['background'],
                         relief=RAISED)
         self.place(relx=.25, rely=0, relheight=1, relwidth=.75)
+        self.__create_widgets()
+    
+    def __create_widgets(self):
+        def send_msg(event=None):
+            if not msg.get(): return 0 # exits if msg is empty
+            msgDict = {
+                'pseudo': self.master.master.pseudo,
+                'time': datetime.now().strftime('%H:%M'), # current time (format HH:MM)
+                'content': msg.get(),
+                'distant': False
+            }
+            self.master.master.contentFrame.set_new_msg(msgDict)
+            # TODO : envoi à la classe de networking
+            # reset entry
+            msg.set('')
+            if not event:
+                MsgLabel['background'] = self['background']
+                msg.set('new message...')
+        
+        def entry_clicked(event):
+            if msg.get() == 'new message...':
+                msg.set('')
+            event.widget['background'] = '#424864'
+            event.widget.focus_set()
+        
+        msg = StringVar()
+        msg.set('new message...')
+
+        MsgLabel = Entry(self, textvariable=msg, background='#A8B8FF', font=("Arial", 15))
+        MsgLabel.place(relx=.05, rely=.1, relwidth=.9, relheight=.8, anchor='nw')
+        # Entry bindings
+        MsgLabel.bind('<1>', entry_clicked)
+        MsgLabel.bind('<Return>', send_msg)

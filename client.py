@@ -22,6 +22,7 @@ class TopLevel(Tk):
         super().__init__()
         self.version = __VERSION__
         self.authors = __AUTHORS__
+        self.pseudo = 'Anon'
         self.iconphoto(True, PhotoImage(file="assets/logo.png"))
         self.title(
             f"Concord client v{__VERSION__}")
@@ -37,7 +38,7 @@ class TopLevel(Tk):
         self.bind('<MouseWheel>', self.contentFrame.scroll_msgs)
         self.Menu = MenuBar(self)
         self.config(menu=self.Menu)
-        self.contentFrame.render_msgs()
+        self.contentFrame.show_last_msg()
 
 def main():
     print("===============================================================")

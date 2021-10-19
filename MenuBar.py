@@ -21,3 +21,4 @@ class MenuBar(Menu):
                     f"Concord client v{self.master.version}\nMade by {self.master.authors}, 2021 \
                     \nSource : https://github.com/Ilade-s/Concord_client_tk \
                     \nAssets : https://feathericons.com/"))
+        
