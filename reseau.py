@@ -120,7 +120,7 @@ class reseau:
             ID = self.chat[0]+1
             TIME = time.strftime('%H:%M', time.localtime())
             self.chat[0] = ID
-            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message}
+            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
             if Cons: print(f"{pseudo} >> {message}")
 
     def __GetMessageOfClient(self,client,Cons=False):
@@ -141,7 +141,7 @@ class reseau:
             ID = self.chat[0]+1
             TIME = time.strftime('%H:%M', time.localtime())
             self.chat[0] = ID
-            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message}
+            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
             if Cons: print(f"{pseudo} >> {message}")
             #Envoie du message vers les autres client !
             for newclient in self.listclient:
