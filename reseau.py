@@ -60,8 +60,8 @@ class reseau:
         """
         self.serveurstart = False
         for client in range(len(self.listclient)):
-            self.listclient.pop(client)
             self.listclient[client].close()
+            self.listclient.pop(client)
         self.sock.close()
 
     def CloseClient(self):

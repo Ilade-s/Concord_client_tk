@@ -31,6 +31,7 @@ class ContentFrame(Frame):
         #self.eventFrame = EventFrame(self)
         self.msgList = []
         self.rendered_msgs = []
+        self.member_list = []
         self.msgIndex = 0
         #self.__debug_setup()
         self.msgStart = False
@@ -109,12 +110,18 @@ class ContentFrame(Frame):
     def update_message_server(self):
         while self.msgStart:
             time.sleep(1)
+            new_msgs = False
             msg = self.master.network.FetchMessage()
             for cle, element in msg.items():
                 if cle and element not in self.msgList:
                     if element['distant']:
                         self.msgList.append(element)
-                        self.render_msgs()
+                        self.master.log.add_message(element)
+                        new_msgs = True
+                        if element['pseudo'] not in self.member_list:
+                            self.member_list.append(element['pseudo'])
+                            self.master.log.add_member(element['pseudo'])
+            if new_msgs: self.render_msgs()
 
 class MessageTemplate(LabelFrame):
 

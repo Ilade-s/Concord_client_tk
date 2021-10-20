@@ -51,6 +51,7 @@ class EventFrame(LabelFrame):
                 else:
                     self.master.master.network.ClientMessagerie(target_ip, port)
 
+                self.master.master.host = ashost
                 self.master.master.log = LogHandler(pseudo, ashost) # create log file
                 self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
                 self.master.master.navBar.infoFrame.update_connexionLabel(target_ip, ashost)

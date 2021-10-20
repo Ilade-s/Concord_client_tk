@@ -2,7 +2,7 @@
 Interface client en tkinter de la messagerie instantanée Concord
 """
 from tkinter import *
-from tkinter import ttk
+from tkinter import ttk, messagebox as msgbox
 # Frames individuelles
 from NavBar import NavBar
 from ContentFrame import ContentFrame
@@ -37,6 +37,17 @@ class TopLevel(Tk):
         """
         Place les Frames dans la grille
         """
+        def close_window():
+            if self.network.serveurstart and msgbox.askyesno('Quit', 'Are you sure you want to quit ?'):
+                if self.host:
+                    self.network.CloseBind()
+                else:
+                    self.network.CloseClient()
+                
+            self.destroy()
+            exit()
+
+        self.protocol("WM_DELETE_WINDOW", close_window)
         self.contentFrame = ContentFrame(self)
         self.navBar = NavBar(self)
         self.bind('<MouseWheel>', self.contentFrame.scroll_msgs)

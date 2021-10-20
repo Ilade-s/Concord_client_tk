@@ -61,7 +61,7 @@ class InfoFrame(LabelFrame):
         ip : str
         ashost : bool
         """
-        self.connexionStatusLabel['text'] = f'Connexion : {ip} ' + '(host)' if ashost else '(client)'
+        self.connexionStatusLabel['text'] = f'Connexion : {ip} ' + ('(host)' if ashost else '(client)')
     
 
 class InputFrame(Frame):
