@@ -1,0 +1,94 @@
+{
+    "pseudo": "Anon",
+    "creation_time": "21:40",
+    "is_host": false,
+    "members": {
+        "123.145.156.178": "Pedro"
+    },
+    "messages": [
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "aaaa",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "dd",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fds",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fs",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fd",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fd",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fds",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "f",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "df",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "df",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "df",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "d",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fd",
+            "distant": false
+        },
+        {
+            "pseudo": "Anon",
+            "time": "21:40",
+            "content": "fd",
+            "distant": false
+        }
+    ]
+}
