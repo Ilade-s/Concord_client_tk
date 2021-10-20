@@ -7,8 +7,7 @@ from tkinter import ttk
 from NavBar import NavBar
 from ContentFrame import ContentFrame
 from MenuBar import MenuBar
-from logHandler import LogHandler
-import reseau
+from reseau import reseau
 
 __AUTHORS__ = 'Raphaël, Matheo and Alban'
 __VERSION__ = '0.1'
@@ -26,10 +25,8 @@ class TopLevel(Tk):
         self.authors = __AUTHORS__
         self.pseudo = 'Anon'
         self.host = False
-        # TEST --------------
-        self.log = LogHandler(self.pseudo, False)
-        self.log.add_member('Pedro', '123.145.156.178')
-        # TEST --------------
+        self.log = None
+        self.network = reseau(pseudo=self.pseudo)
         self.iconphoto(True, PhotoImage(file="assets/logo.png"))
         self.title(
             f"Concord client v{__VERSION__}")

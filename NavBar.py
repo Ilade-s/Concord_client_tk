@@ -53,6 +53,16 @@ class InfoFrame(LabelFrame):
         self.renderedMsgsLabel['text'] = 'Messages affichés : {} to {}'.format(
                 newindex, newindex + n_rnd_msgs)
     
+    def update_logLabel(self, filename):
+        self.LogLabel['text'] = 'log : ' + filename
+    
+    def update_connexionLabel(self, ip, ashost):
+        """
+        ip : str
+        ashost : bool
+        """
+        self.connexionStatusLabel['text'] = f'Connexion : {ip} ' + '(host)' if ashost else '(client)'
+    
 
 class InputFrame(Frame):
 
@@ -73,7 +83,7 @@ class InputFrame(Frame):
             }
             self.master.master.log.add_message(msgDict)
             self.master.master.contentFrame.set_new_msg(msgDict)
-            # TODO : envoi à la classe de networking
+            self.master.master.network.SendMessage(msgDict['content'])
             # reset entry
             msg.set('')
             if not event:

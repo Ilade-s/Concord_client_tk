@@ -7,6 +7,7 @@ from tkinter import *
 from tkinter import ttk
 from EventFrame import *
 import time
+from threading import Thread #Permet de faire tourner des fonctions en meme temps (async)
 
 defaultMessage = {
     'pseudo': 'Pedro',
@@ -31,7 +32,7 @@ class ContentFrame(Frame):
         self.msgList = []
         self.rendered_msgs = []
         self.msgIndex = 0
-        self.__debug_setup()
+        #self.__debug_setup()
         self.msgStart = False
     
     def __debug_setup(self):
@@ -39,12 +40,18 @@ class ContentFrame(Frame):
             self.msgList.append(defaultMessage)
             self.msgList.append(defaultMessage2)
     
+    def setup_join(self):
+        self.msgStart = True
+        GetMessage = Thread(target=self.update_message_server)
+        GetMessage.start()
+    
     def show_last_msg(self):
         """
         render_msgs which go to the last messages
         """
         nMsgs_renderable = self.get_maxAff()
         self.msgIndex = len(self.msgList) - nMsgs_renderable
+        if self.msgIndex < 0: self.msgIndex = 0
         self.render_msgs()
     
     def scroll_msgs(self, event):
@@ -99,14 +106,15 @@ class ContentFrame(Frame):
             maxMsgs = 100
         return maxMsgs
 
-
-    def actu_message(self):
+    def update_message_server(self):
         while self.msgStart:
             time.sleep(1)
-            msg = self.reseau.FetchMessage
-            for cle,element in msg.items():
+            msg = self.master.network.FetchMessage()
+            for cle, element in msg.items():
                 if cle and element not in self.msgList:
-                    self.msgList.append(element)
+                    if element['distant']:
+                        self.msgList.append(element)
+                        self.render_msgs()
 
 class MessageTemplate(LabelFrame):
 

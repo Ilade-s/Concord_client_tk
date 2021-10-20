@@ -72,6 +72,9 @@ class LogHandler:
         """update the log file with new data from self.content"""
         with open(self.path, 'w+') as file:
             json.dump(self.content, file)
+    
+    def get_path(self):
+        return self.path.split('/')[-1]
 
 
 if __name__ == '__main__':
