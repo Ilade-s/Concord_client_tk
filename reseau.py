@@ -15,6 +15,8 @@ class reseau:
         self.pseudo = pseudo
         self.waitmessage = []
         self.chat = {0:0}
+        self.ip = ""
+        self.port = 0
 
     def __bind(self,Host,Port, Cons=False):
         """
@@ -22,7 +24,8 @@ class reseau:
             - Host : ip souhaité
             - Port : port ouvert afin de communiquer
         """
-
+        self.ip = Host
+        self.port = Port
         self.sock.bind((Host, Port))
         self.sock.listen(5)
         if Cons: print(f"Ouverture Hote : > {Host} PORT {Port}")
@@ -56,9 +59,15 @@ class reseau:
         [ATTENTION] Ne pas lancer la fonction en tant que client (non hote)
         """
         self.serveurstart = False
-        for client in self.listclient:
-            client.close()
+        for client in range(len(self.listclient)):
+            self.listclient.pop(client)
+            self.listclient[client].close()
         self.sock.close()
+
+    def CloseClient(self):
+        msg = ("§STOPCLIENT§")
+        codemsg = msg.encode("utf-8")
+        self.sock.send(codemsg)
 
     def __SendMessageByHote(self):
         while self.serveurstart:
@@ -94,6 +103,9 @@ class reseau:
             envoie = input(f"--------- SEND >> ")
             if envoie == "/stop host":
                 self.CloseBind()
+            elif envoie == "/stop client":
+                self.CloseClient()
+                print("stop client envoye")
             else:
                 self.SendMessage(envoie,True)
 
@@ -115,21 +127,26 @@ class reseau:
         requete_client = client.recv(500) #Recuperation des messages
         requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8
 
-        #Fractionnage du message
-        posbreak = requete_client_decode.find("§")
-        pseudo = requete_client_decode[0:posbreak]
-        message = requete_client_decode[posbreak+1:len(requete_client_decode)]
-
-        #Stockage du message
-        ID = self.chat[0]+1
-        TIME = time.strftime('%H:%M', time.localtime())
-        self.chat[0] = ID
-        self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message}
-        if Cons: print(f"{pseudo} >> {message}")
-        #Envoie du message vers les autres client !
-        for newclient in self.listclient:
-            if newclient != client:
-                newclient.send(requete_client)
+        if requete_client_decode == "§STOPCLIENT§":
+            for infoclient in range(len(self.listclient)):
+                if self.listclient[infoclient]==client:
+                    self.listclient.pop(infoclient)
+        else:
+            #Fractionnage du message
+            posbreak = requete_client_decode.find("§")
+            pseudo = requete_client_decode[0:posbreak]
+            message = requete_client_decode[posbreak+1:len(requete_client_decode)]
+        
+            #Stockage du message
+            ID = self.chat[0]+1
+            TIME = time.strftime('%H:%M', time.localtime())
+            self.chat[0] = ID
+            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message}
+            if Cons: print(f"{pseudo} >> {message}")
+            #Envoie du message vers les autres client !
+            for newclient in self.listclient:
+                if newclient != client:
+                    newclient.send(requete_client)
 
     def __GetAllMessageByServer(self,Cons=False):
         while self.serveurstart:
@@ -166,8 +183,6 @@ class reseau:
             console = Thread(target=self.__ConsoleUseSend())
             console.start()
 
-
-
     def FetchMessage(self):
         """
         Retourne un dictionnaire contenant tout les messages reçus.
@@ -177,9 +192,27 @@ class reseau:
         """
         return self.chat
 
+    def ChangPseudo(self,pseudo):
+        """
+        Permet de modifier le pseudo. 
+        La fonction retourne aussi l'ancien pseudo.
+        """
+        old = self.pseudo
+        self.pseudo = pseudo
+        return old
 
+    def GetPseudo(self):
+        """
+        Retourne le pseudo de l'utilisateur.
+        """
+        return self.pseudo
 
-    
+    def GetInformationConnexion(self):
+        """
+        Retourne l'ip et le port sous forme de tuple (self.ip,self.port)
+        (str | int)
+        """
+        return(self.ip,self.port)
 
     
 
