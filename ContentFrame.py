@@ -6,6 +6,7 @@ TODO
 from tkinter import *
 from tkinter import ttk
 from EventFrame import *
+import time
 
 defaultMessage = {
     'pseudo': 'Pedro',
@@ -31,6 +32,7 @@ class ContentFrame(Frame):
         self.rendered_msgs = []
         self.msgIndex = 0
         self.__debug_setup()
+        self.msgStart = False
     
     def __debug_setup(self):
         for _ in range(10):
@@ -96,6 +98,15 @@ class ContentFrame(Frame):
         else:    
             maxMsgs = 100
         return maxMsgs
+
+
+    def actu_message(self):
+        while self.msgStart:
+            time.sleep(1)
+            msg = self.reseau.FetchMessage
+            for cle,element in msg.items():
+                if cle and element not in self.msgList:
+                    self.msgList.append(element)
 
 class MessageTemplate(LabelFrame):
 

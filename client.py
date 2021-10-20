@@ -8,6 +8,7 @@ from NavBar import NavBar
 from ContentFrame import ContentFrame
 from MenuBar import MenuBar
 from logHandler import LogHandler
+import reseau
 
 __AUTHORS__ = 'Raphaël, Matheo and Alban'
 __VERSION__ = '0.1'
@@ -56,6 +57,7 @@ def main():
 
     client = TopLevel()
     client.mainloop()
+
 
 if __name__ == '__main__':
     main()
