@@ -39,13 +39,15 @@ class TopLevel(Tk):
         """
         def close_window():
             if self.network.serveurstart and msgbox.askyesno('Quit', 'Are you sure you want to quit ?'):
-                if self.host:
-                    self.network.CloseBind()
-                else:
-                    self.network.CloseClient()
+                try:
+                    if self.host:
+                        self.network.CloseBind()
+                    else:
+                        self.network.CloseClient()
+                except Exception:
+                    pass
                 
             self.destroy()
-            exit()
 
         self.protocol("WM_DELETE_WINDOW", close_window)
         self.contentFrame = ContentFrame(self)

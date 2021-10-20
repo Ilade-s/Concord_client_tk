@@ -13,6 +13,7 @@ class MenuBar(Menu):
 
     def __init__(self, master) -> None:
         super().__init__(master)
+        self.eventFrame = None
         self.master = master
         # Création des menus déroulants    
         self.create_connect_menu()
@@ -33,9 +34,11 @@ class MenuBar(Menu):
             label="Join room as guest...", command=self.join_room)
     
     def create_room(self):
-        EventFrame(self.master.contentFrame, 'connexion', True)
+        if self.eventFrame: self.eventFrame.destroy()
+        self.eventFrame = EventFrame(self.master.contentFrame, 'connexion', True)
 
     def join_room(self):
-        EventFrame(self.master.contentFrame, 'connexion', False)
+        if self.eventFrame: self.eventFrame.destroy()
+        self.eventFrame = EventFrame(self.master.contentFrame, 'connexion', False)
 
         

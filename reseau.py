@@ -68,6 +68,7 @@ class reseau:
         msg = ("§STOPCLIENT§")
         codemsg = msg.encode("utf-8")
         self.sock.send(codemsg)
+        self.serveurstart = False
 
     def __SendMessageByHote(self):
         while self.serveurstart:

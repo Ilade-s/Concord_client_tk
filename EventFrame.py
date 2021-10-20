@@ -62,7 +62,7 @@ class EventFrame(LabelFrame):
                 msgbox.showerror(
                     "login Serveur", f"Echec {'du hosting' if ashost else 'de la connexion'}, veuillez réessayer : {e}")
 
-        self["text"] = "Connexion à une salle"
+        self["text"] = "Création de salle" if ashost else "Connexion à une salle"
         ip = StringVar()
         pseudo = StringVar()
         ip.set('localhost')
