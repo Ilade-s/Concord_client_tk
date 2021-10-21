@@ -35,7 +35,7 @@ class MenuBar(Menu):
     
     def create_room(self):
         if self.eventFrame: self.eventFrame.destroy()
-        self.eventFrame = EventFrame(self.master.contentFrame, 'connexion', True)
+        self.eventFrame = EventFrame(self.master.contentFrame, 'host', True)
 
     def join_room(self):
         if self.eventFrame: self.eventFrame.destroy()

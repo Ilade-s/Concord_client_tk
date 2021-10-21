@@ -180,7 +180,7 @@ class reseau:
                 psd,ip = message.split("|")
                 self.DicoClient[ip] = {"pseudo":psd,"client":client}
                 #Envoie d'un message a titre INFORMATIF
-                self.__AddMessageInfo(f"{psd} viens de se connecter")
+                self.__AddMessageInfo(f"{psd} vient de se connecter")
             
             else:
                 ID = self.chat[0]+1
@@ -280,4 +280,4 @@ if __name__ == "__main__":
     if etat == "H":
         test.HostMessagerie(6300,True)
     else:
-        test.ClientMessagerie("172.20.10.2",6300,True)
+        test.ClientMessagerie("192.168.15.214",6300,True)
