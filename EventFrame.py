@@ -45,7 +45,7 @@ class EventFrame(LabelFrame):
             pseudo = pseudo.get()
             try:
                 self.master.master.pseudo = pseudo
-                self.master.master.network.ChangPseudo(pseudo)
+                self.master.master.network.ChangePseudo(pseudo)
                 if ashost:
                     self.master.master.network.HostMessagerie(target_ip, port)
                 else:
