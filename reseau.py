@@ -32,42 +32,21 @@ class reseau:
         self.sock.bind((Host, Port))
         self.sock.listen(5)
 
-        # upnp.discover()
-        # device = upnp.get_igd()
-        # print(device.get_services())
-        # service = device['WANIPConn1']
-        # service.get_actions()
-        # print(service.GetExternalIPAddress())
-
+        # Create Upnp rules
         upnp.discover()
         device = upnp.get_igd()
-        print(device.get_services())
         service = device['WANIPConn1']
-        # service.get_actions()
-
-        #DElete port
-        service.DeletePortMapping.get_input_arguments()
-        service.DeletePortMapping(
+        service.AddPortMapping.get_input_arguments()
+        service.AddPortMapping(
             NewRemoteHost='',
             NewExternalPort=self.port,
             NewProtocol='TCP',
+            NewInternalPort=self.port,
+            NewInternalClient=self.ip,
+            NewEnabled=1,
+            NewPortMappingDescription='Concord client',
+            NewLeaseDuration=0
         )
-
-
-        #ADD port
-        # service.AddPortMapping.get_input_arguments()
-        # print(self.port)
-        # print(self.ip)
-        # service.AddPortMapping(
-        #     NewRemoteHost='',
-        #     NewExternalPort=self.port,
-        #     NewProtocol='TCP',
-        #     NewInternalPort=self.port,
-        #     NewInternalClient=self.ip,
-        #     NewEnabled=1,
-        #     NewPortMappingDescription='Concord client',
-        #     NewLeaseDuration=0
-        # )
         if Cons: print(f"Ouverture Hote : > {Host} PORT {Port}")
 
     def __ConnexionMessagerie(self, Host, Port, Cons=False):
@@ -98,6 +77,7 @@ class reseau:
 
         [ATTENTION] Ne pas lancer la fonction en tant que client (non hote)
         """
+        self.close_Upnp()
         self.SendMessage("*WARNING* | L'hote vient de fermer la session.")
         time.sleep(1)
         self.serveurstart = False
@@ -108,6 +88,7 @@ class reseau:
         self.sock.close()
 
     def CloseClient(self):
+        self.close_Upnp()
         msg = ("§STOPCLIENT§")
         codemsg = msg.encode("utf-8")
         self.sock.send(codemsg)
@@ -276,6 +257,19 @@ class reseau:
         (str | int)
         """
         return(self.ip,self.port)
+
+    def close_Upnp(self):
+        """
+            Close Upnp port created
+        """
+        device = upnp.get_igd()
+        service = device['WANIPConn1']
+        service.DeletePortMapping.get_input_arguments()
+        service.DeletePortMapping(
+            NewRemoteHost='',
+            NewExternalPort=self.port,
+            NewProtocol='TCP',
+        )
 
     
 
