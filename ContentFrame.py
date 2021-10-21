@@ -116,7 +116,7 @@ class ContentFrame(Frame):
             new_msgs = False
             msg = self.master.network.FetchMessage()
             for cle, element in msg.items():
-                if cle and element not in self.msgList:
+                if cle and cle > len(self.msgList):
                     if element['distant']:
                         self.msgList.append(element)
                         self.master.log.add_message(element)
