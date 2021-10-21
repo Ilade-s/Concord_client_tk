@@ -115,8 +115,8 @@ class ContentFrame(Frame):
             time.sleep(1)
             new_msgs = False
             msg = self.master.network.FetchMessage()
-            for cle, element in msg.items():
-                if cle and cle > len(self.msgList):
+            for cle, element in msg.copy().items():
+                if cle > len([msg for msg in self.msgList if msg['distant']]):
                     if element['distant']:
                         self.msgList.append(element)
                         self.master.log.add_message(element)
@@ -138,12 +138,24 @@ class MessageTemplate(LabelFrame):
                             else f"{message['pseudo']} (You) ({message['time']})",
                         relief=RAISED, foreground='white')
         # ajout texte
-        ttk.Label(self, text=message['content'], style="Message.TLabel"
-            , background='#292D3E', foreground='white').pack(padx=5, pady=2)
+        msgLabel = ttk.Label(self, text=message['content'], style="Message.TLabel"
+            , background='#292D3E', foreground='white')
+        msgLabel.pack(padx=5, pady=2)
         # configure style
         s = ttk.Style(self)
         s.configure("Message.TLabel", font=("Arial", fontSize))
-
-        self.pack(anchor="nw" if message['distant'] else "ne", padx=5)
+        # find good anchor
+        if message['info']:
+            anchor = CENTER
+            msgLabel['background'] = 'white'
+            msgLabel['foreground'] = 'black'
+            self['background'] = 'white'
+            self['foreground'] = 'black'
+            self['text'] = 'INFORMATION'
+        elif message['distant']:
+            anchor = "nw"
+        else:
+            anchor = "ne"
+        self.pack(anchor=anchor, padx=5)
         
     

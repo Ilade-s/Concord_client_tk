@@ -79,7 +79,8 @@ class InputFrame(Frame):
                 'pseudo': self.master.master.pseudo,
                 'time': datetime.now().strftime('%H:%M'), # current time (format HH:MM)
                 'content': msg.get(),
-                'distant': False
+                'distant': False,
+                'info': False
             }
             self.master.master.log.add_message(msgDict)
             self.master.master.contentFrame.set_new_msg(msgDict)
