@@ -1,6 +1,9 @@
 import socket
 from threading import Thread #Permet de faire tourner des fonctions en meme temps (async)
 import time
+import upnpy
+
+upnp = upnpy.UPnP()
 
 class reseau:
     """
@@ -28,6 +31,43 @@ class reseau:
         self.port = Port
         self.sock.bind((Host, Port))
         self.sock.listen(5)
+
+        # upnp.discover()
+        # device = upnp.get_igd()
+        # print(device.get_services())
+        # service = device['WANIPConn1']
+        # service.get_actions()
+        # print(service.GetExternalIPAddress())
+
+        upnp.discover()
+        device = upnp.get_igd()
+        print(device.get_services())
+        service = device['WANIPConn1']
+        # service.get_actions()
+
+        #DElete port
+        service.DeletePortMapping.get_input_arguments()
+        service.DeletePortMapping(
+            NewRemoteHost='',
+            NewExternalPort=self.port,
+            NewProtocol='TCP',
+        )
+
+
+        #ADD port
+        # service.AddPortMapping.get_input_arguments()
+        # print(self.port)
+        # print(self.ip)
+        # service.AddPortMapping(
+        #     NewRemoteHost='',
+        #     NewExternalPort=self.port,
+        #     NewProtocol='TCP',
+        #     NewInternalPort=self.port,
+        #     NewInternalClient=self.ip,
+        #     NewEnabled=1,
+        #     NewPortMappingDescription='Concord client',
+        #     NewLeaseDuration=0
+        # )
         if Cons: print(f"Ouverture Hote : > {Host} PORT {Port}")
 
     def __ConnexionMessagerie(self, Host, Port, Cons=False):
