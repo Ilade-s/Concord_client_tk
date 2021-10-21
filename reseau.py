@@ -72,7 +72,7 @@ class reseau:
         msg = ("§STOPCLIENT§")
         codemsg = msg.encode("utf-8")
         self.sock.send(codemsg)
-        self.SendMessage(f"--> {self.pseudo} s'est déconnecté")
+        self.__AddMessageInfo(f"{self.pseudo} s'est déconnecté")
         time.sleep(1)
         self.serveurstart = False
     
