@@ -98,34 +98,48 @@ class reseau:
 
         [ATTENTION] Ne pas lancer la fonction en tant que client (non hote)
         """
+        self.SendMessage("*WARNING* | L'hote vient de fermer la session.")
+        time.sleep(1)
         self.serveurstart = False
+        time.sleep(1)
         for client in range(len(self.listclient)):
-            self.listclient.pop(client)
             self.listclient[client].close()
+            self.listclient.pop(client)
         self.sock.close()
 
     def CloseClient(self):
         msg = ("§STOPCLIENT§")
         codemsg = msg.encode("utf-8")
         self.sock.send(codemsg)
+        self.SendMessage(f"--> {self.pseudo} s'est déconnecté")
+        time.sleep(1)
+        self.serveurstart = False
 
     def __SendMessageByHote(self):
         while self.serveurstart:
             if not self.waitmessage:
                 time.sleep(1)
                 continue
-            msg = f"{self.pseudo}§{self.waitmessage[0]}"
-            codemsg = msg.encode("utf-8")
-            self.waitmessage.pop(0)
-            for client in self.listclient:
-                client.send(codemsg)
+
+            message = self.waitmessage[0]
+
+            if message[0] != '/':
+                msg = f"{self.pseudo}§{message}§"
+                codemsg = msg.encode("utf-8")
+                self.waitmessage.pop(0)
+                for client in self.listclient:
+                    client.send(codemsg)
+            else:
+                self.waitmessage.pop(0)
+                if len(message) > 3 and message[0:2] == '/ip':
+                    pass
 
     def __SendMessageByClient(self):
         while self.serveurstart:
             if not self.waitmessage:
                 time.sleep(1)
                 continue
-            msg = f"{self.pseudo}§{self.waitmessage[0]}"
+            msg = f"{self.pseudo}§{self.waitmessage[0]}§"
             codemsg = msg.encode("utf-8")
             self.waitmessage.pop(0)
             self.sock.send(codemsg)
@@ -153,40 +167,44 @@ class reseau:
         while self.serveurstart:
             requete_server = self.sock.recv(500)
             requete_server = requete_server.decode("utf-8")
-            posbreak = requete_server.find("§")
-
-            pseudo = requete_server[0:posbreak]
-            message = requete_server[posbreak+1:len(requete_server)]
-            ID = self.chat[0]+1
-            TIME = time.strftime('%H:%M', time.localtime())
-            self.chat[0] = ID
-            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
-            if Cons: print(f"{pseudo} >> {message}")
+            a = requete_server.split("§")
+            pseudoList = [a[i] for i in range(0, len(a), 2)]
+            msgList = [a[i] for i in range(1, len(a), 2)]
+            for pseudo, message in zip(pseudoList, msgList):
+                ID = self.chat[0]+1
+                TIME = time.strftime('%H:%M', time.localtime())
+                self.chat[0] = ID
+                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
+                if Cons: print(f"{pseudo} >> {message}")
 
     def __GetMessageOfClient(self,client,Cons=False):
         requete_client = client.recv(500) #Recuperation des messages
         requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8
 
-        if requete_client_decode == "§STOPCLIENT§":
-            for infoclient in range(len(self.listclient)):
-                if self.listclient[infoclient]==client:
-                    self.listclient.pop(infoclient)
-        else:
-            #Fractionnage du message
-            posbreak = requete_client_decode.find("§")
-            pseudo = requete_client_decode[0:posbreak]
-            message = requete_client_decode[posbreak+1:len(requete_client_decode)]
-        
-            #Stockage du message
-            ID = self.chat[0]+1
-            TIME = time.strftime('%H:%M', time.localtime())
-            self.chat[0] = ID
-            self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
-            if Cons: print(f"{pseudo} >> {message}")
-            #Envoie du message vers les autres client !
-            for newclient in self.listclient:
-                if newclient != client:
-                    newclient.send(requete_client)
+        #Stockage du message
+        a = requete_client_decode.split("§")
+        pseudoList = [a[i] for i in range(0, len(a), 2)]
+        msgList = [a[i] for i in range(1, len(a), 2)]
+        for pseudo, message in zip(pseudoList, msgList):
+            
+            if message == "STOPCLIENT":
+                for infoclient in range(len(self.listclient)):
+                    if self.listclient[infoclient]==client:
+                        self.listclient.pop(infoclient)
+
+            elif requete_client_decode == "GETIP":
+                pass
+
+            else:
+                ID = self.chat[0]+1
+                TIME = time.strftime('%H:%M', time.localtime())
+                self.chat[0] = ID
+                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
+                if Cons: print(f"{pseudo} >> {message}")
+        #Envoie du message vers les autres client !
+        for newclient in self.listclient:
+            if newclient != client:
+                newclient.send(requete_client)
 
     def __GetAllMessageByServer(self,Cons=False):
         while self.serveurstart:
@@ -214,6 +232,11 @@ class reseau:
 
         self.serveurstart = True
         self.__ConnexionMessagerie(Host,Port,Cons) #Ouverture de la connexion vers l'hote
+        #Envoie cart identite vers le HOST
+        # carte = "§CARTEID§|"
+        # codemsg = carte.encode("utf-8")
+        # self.sock.send(codemsg)
+
         get = Thread(target=self.__GetMessageByClient,args=[Cons])
         send = Thread(target=self.__SendMessageByClient)
         get.start()
@@ -232,7 +255,7 @@ class reseau:
         """
         return self.chat
 
-    def ChangPseudo(self,pseudo):
+    def ChangePseudo(self,pseudo):
         """
         Permet de modifier le pseudo. 
         La fonction retourne aussi l'ancien pseudo.
@@ -264,4 +287,4 @@ if __name__ == "__main__":
     if etat == "H":
         test.HostMessagerie("172.20.10.2",5415,True)
     else:
-        test.ClientMessagerie("172.20.10.2",5415,True)
+        test.ClientMessagerie("172.20.10.6",6300,True)

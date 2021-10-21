@@ -61,7 +61,7 @@ class InfoFrame(LabelFrame):
         ip : str
         ashost : bool
         """
-        self.connexionStatusLabel['text'] = f'Connexion : {ip} ' + '(host)' if ashost else '(client)'
+        self.connexionStatusLabel['text'] = f'Connexion : {ip} ' + ('(host)' if ashost else '(client)')
     
 
 class InputFrame(Frame):
@@ -74,7 +74,7 @@ class InputFrame(Frame):
     
     def __create_widgets(self):
         def send_msg(event=None):
-            if not msg.get(): return 0 # exits if msg is empty
+            if not msg.get() or not self.master.master.log: return 0 # exits if msg is empty
             msgDict = {
                 'pseudo': self.master.master.pseudo,
                 'time': datetime.now().strftime('%H:%M'), # current time (format HH:MM)
