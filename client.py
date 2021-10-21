@@ -40,6 +40,7 @@ class TopLevel(Tk):
         def close_window():
             if self.network.serveurstart and msgbox.askyesno('Quit', 'Are you sure you want to quit ?'):
                 try:
+                    self.contentFrame.stop_update()
                     if self.host:
                         self.network.CloseBind()
                     else:

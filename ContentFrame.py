@@ -46,6 +46,9 @@ class ContentFrame(Frame):
         GetMessage = Thread(target=self.update_message_server)
         GetMessage.start()
     
+    def stop_update(self):
+        self.msgStart = False
+    
     def show_last_msg(self):
         """
         render_msgs which go to the last messages

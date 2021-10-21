@@ -35,6 +35,7 @@ class LogHandler:
 
         }
         path = f'logs/{datetime.today().strftime("%Y-%m-%d")}.json'
+        if not os.path.exists('logs/'): os.mkdir('logs/')
         if os.path.exists(path):
             i = 0
             pathAlt = path
