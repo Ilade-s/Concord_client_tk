@@ -58,9 +58,9 @@ class reseau:
 
         [ATTENTION] Ne pas lancer la fonction en tant que client (non hote)
         """
-        self.serveurstart = False
-
         self.SendMessage("*WARNING* | L'hote vient de fermer la session.")
+        time.sleep(1)
+        self.serveurstart = False
         time.sleep(1)
         for client in range(len(self.listclient)):
             self.listclient[client].close()
