@@ -64,7 +64,7 @@ class reseau:
         self.serveurstart = False
         time.sleep(1)
         for cle,element in self.DicoClient.items():
-            self.DicoClient[element]["client"].close()
+            element["client"].close()
             self.DicoClient.pop(cle)
         self.sock.close()
 
@@ -164,7 +164,7 @@ class reseau:
             
             if message == "STOPCLIENT":
                 for cle,element in self.DicoClient.items():
-                    if self.DicoClient[element]["client"] == client:
+                    if element["client"] == client:
                         self.DicoClient.pop(cle)
                         client.close()
 
