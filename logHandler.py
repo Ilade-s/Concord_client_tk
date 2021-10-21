@@ -34,7 +34,7 @@ class LogHandler:
             'messages': [],
 
         }
-        path = f'__logs__/{datetime.today().strftime("%Y-%m-%d")}.json'
+        path = f'logs/{datetime.today().strftime("%Y-%m-%d")}.json'
         if os.path.exists(path):
             i = 0
             pathAlt = path
