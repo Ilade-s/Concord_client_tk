@@ -18,7 +18,7 @@ class LogHandler:
             - pseudo : nom choisi pour la discussion (str)
             - creation : heure (HH:MM) de création du fichier (str)
             - is_host : informe si ce client était hôte ou invité (bool)
-            - members : autres membres de la discussion (dict[ip: pseudo]) (vide au départ)
+            - members : liste des autres membres de la discussion (liste[pseudo]) (vide au départ)
             - messages : liste des messages envoyés, sous la forme de dictionnaire (list[msg: dict])
 
         PARAMETRES :
@@ -30,11 +30,12 @@ class LogHandler:
             'pseudo': pseudo,
             'creation_time': datetime.now().strftime('%H:%M'),
             'is_host': is_host,
-            'members': {},
+            'members': [],
             'messages': [],
 
         }
         path = f'logs/{datetime.today().strftime("%Y-%m-%d")}.json'
+        if not os.path.exists('logs/'): os.mkdir('logs/')
         if os.path.exists(path):
             i = 0
             pathAlt = path
@@ -59,8 +60,8 @@ class LogHandler:
         self.content['pseudo'] = new_pseudo
         self.commit()
     
-    def add_member(self, name, ip):
-        self.content['members'][ip] = name
+    def add_member(self, name):
+        self.content['members'].append(name)
         self.commit()
     
     def add_message(self, msg):

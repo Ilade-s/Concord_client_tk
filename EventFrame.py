@@ -45,12 +45,13 @@ class EventFrame(LabelFrame):
             pseudo = pseudo.get()
             try:
                 self.master.master.pseudo = pseudo
-                self.master.master.network.ChangPseudo(pseudo)
+                self.master.master.network.ChangePseudo(pseudo)
                 if ashost:
                     self.master.master.network.HostMessagerie(target_ip, port)
                 else:
                     self.master.master.network.ClientMessagerie(target_ip, port)
 
+                self.master.master.host = ashost
                 self.master.master.log = LogHandler(pseudo, ashost) # create log file
                 self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
                 self.master.master.navBar.infoFrame.update_connexionLabel(target_ip, ashost)
@@ -61,7 +62,7 @@ class EventFrame(LabelFrame):
                 msgbox.showerror(
                     "login Serveur", f"Echec {'du hosting' if ashost else 'de la connexion'}, veuillez réessayer : {e}")
 
-        self["text"] = "Connexion à une salle"
+        self["text"] = "Création de salle" if ashost else "Connexion à une salle"
         ip = StringVar()
         pseudo = StringVar()
         ip.set('localhost')
