@@ -115,7 +115,7 @@ class ContentFrame(Frame):
             time.sleep(1)
             new_msgs = False
             msg = self.master.network.FetchMessage()
-            for cle, element in msg.items():
+            for cle, element in msg.copy().items():
                 if cle > len([msg for msg in self.msgList if msg['distant']]):
                     if element['distant']:
                         self.msgList.append(element)
