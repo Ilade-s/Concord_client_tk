@@ -11,11 +11,11 @@ class reseau:
     def __init__(self, sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM), pseudo="User"):
         self.sock = sock
         self.serveurstart = False
-        self.listclient = []
+        self.DicoClient = {} #Liste de tout les clients
         self.pseudo = pseudo
         self.waitmessage = []
         self.chat = {0:0}
-        self.ip = ""
+        self.ip = socket.gethostbyname(socket.gethostname())
         self.port = 0
 
     def __bind(self,Host,Port, Cons=False):
@@ -46,7 +46,8 @@ class reseau:
 
         while self.serveurstart:
             new_client, ip = self.sock.accept()
-            self.listclient.append(new_client)
+            GetMessage = Thread(target=self.__GetMessageOfClient,args=(new_client,Cons))
+            GetMessage.start()
             if Cons: print(f"Connexion : > {ip}")
 
         if Cons: print("Fermeture port")
@@ -58,13 +59,13 @@ class reseau:
 
         [ATTENTION] Ne pas lancer la fonction en tant que client (non hote)
         """
-        self.SendMessage("*WARNING* | L'hote vient de fermer la session.")
+        self.__AddMessageInfo("*WARNING* | L'hote vient de fermer la session.")
         time.sleep(1)
         self.serveurstart = False
         time.sleep(1)
-        for client in range(len(self.listclient)):
-            self.listclient[client].close()
-            self.listclient.pop(client)
+        for cle,element in self.DicoClient.items():
+            self.DicoClient[element]["client"].close()
+            self.DicoClient.pop(cle)
         self.sock.close()
 
     def CloseClient(self):
@@ -74,6 +75,21 @@ class reseau:
         self.SendMessage(f"--> {self.pseudo} s'est déconnecté")
         time.sleep(1)
         self.serveurstart = False
+    
+    def __AddMessageInfo(self,message):
+        ID = self.chat[0]+1
+        TIME = time.strftime('%H:%M', time.localtime())
+        self.chat[0] = ID
+        self.chat[ID] = {"pseudo":"INFO","time":TIME,"content":message, 'distant': True, 'info': True}
+
+        msg = f"INFO!§{message}§"
+        codemsg = msg.encode("utf-8")
+        for element in self.DicoClient:
+            self.DicoClient[element]["client"].send(codemsg)
+
+
+
+
 
     def __SendMessageByHote(self):
         while self.serveurstart:
@@ -87,11 +103,11 @@ class reseau:
                 msg = f"{self.pseudo}§{message}§"
                 codemsg = msg.encode("utf-8")
                 self.waitmessage.pop(0)
-                for client in self.listclient:
-                    client.send(codemsg)
+                for element in self.DicoClient:
+                    self.DicoClient[element]["client"].send(codemsg)
             else:
                 self.waitmessage.pop(0)
-                if len(message) > 3 and message[0:2] == '/ip':
+                if len(message) >= 3 and message[0:3] == '/ip':
                     pass
 
     def __SendMessageByClient(self):
@@ -131,11 +147,14 @@ class reseau:
             pseudoList = [a[i] for i in range(0, len(a), 2)]
             msgList = [a[i] for i in range(1, len(a), 2)]
             for pseudo, message in zip(pseudoList, msgList):
-                ID = self.chat[0]+1
-                TIME = time.strftime('%H:%M', time.localtime())
-                self.chat[0] = ID
-                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
-                if Cons: print(f"{pseudo} >> {message}")
+                if pseudo == "INFO!":
+                    self.__AddMessageInfo(message)
+                else:
+                    ID = self.chat[0]+1
+                    TIME = time.strftime('%H:%M', time.localtime())
+                    self.chat[0] = ID
+                    self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True, 'info': False}
+                    if Cons: print(f"{pseudo} >> {message}")
 
     def __GetMessageOfClient(self,client,Cons=False):
         requete_client = client.recv(500) #Recuperation des messages
@@ -148,36 +167,44 @@ class reseau:
         for pseudo, message in zip(pseudoList, msgList):
             
             if message == "STOPCLIENT":
-                for infoclient in range(len(self.listclient)):
-                    if self.listclient[infoclient]==client:
-                        self.listclient.pop(infoclient)
+                for cle,element in self.DicoClient.items():
+                    if self.DicoClient[element]["client"] == client:
+                        self.DicoClient.pop(cle)
+                        client.close()
 
             elif requete_client_decode == "GETIP":
                 pass
 
+            elif pseudo == "CARTEID":
+                #Recuperation des deux infos dans le texte
+                psd,ip = message.split("|")
+                self.DicoClient[ip] = {"pseudo":psd,"client":client}
+                #Envoie d'un message a titre INFORMATIF
+                self.__AddMessageInfo(f"{psd} viens de se connecter")
+            
             else:
                 ID = self.chat[0]+1
                 TIME = time.strftime('%H:%M', time.localtime())
                 self.chat[0] = ID
-                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True}
+                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True, 'info': False}
                 if Cons: print(f"{pseudo} >> {message}")
-        #Envoie du message vers les autres client !
-        for newclient in self.listclient:
-            if newclient != client:
-                newclient.send(requete_client)
+                #Envoie du message vers les autres client !
+                for element in self.DicoClient:
+                    if self.DicoClient[element]["client"] != client:
+                        self.DicoClient[element]["client"].send(requete_client)
 
     def __GetAllMessageByServer(self,Cons=False):
         while self.serveurstart:
             time.sleep(1)
-            for client in self.listclient:
-                GetMessage = Thread(target=self.__GetMessageOfClient,args=(client,Cons))
+            for element in self.DicoClient:
+                GetMessage = Thread(target=self.__GetMessageOfClient,args=(self.DicoClient[element]["client"],Cons))
                 GetMessage.start()
 
 
-    def HostMessagerie(self, Host='localhost', Port=6300, Cons=False):
+    def HostMessagerie(self,Port=6300, Cons=False):
 
         self.serveurstart = True
-        self.__bind(Host,Port,Cons) #Ouverture de la session
+        self.__bind(self.ip,Port,Cons) #Ouverture de la session
         request = Thread(target=self.__RequestClient,args=[Cons])
         send = Thread(target=self.__SendMessageByHote)
         get = Thread(target=self.__GetAllMessageByServer,args=[Cons])
@@ -192,10 +219,11 @@ class reseau:
 
         self.serveurstart = True
         self.__ConnexionMessagerie(Host,Port,Cons) #Ouverture de la connexion vers l'hote
+
         #Envoie cart identite vers le HOST
-        # carte = "§CARTEID§|"
-        # codemsg = carte.encode("utf-8")
-        # self.sock.send(codemsg)
+        carte = f"CARTEID§{self.pseudo}|{self.ip}"
+        codemsg = carte.encode("utf-8")
+        self.sock.send(codemsg)
 
         get = Thread(target=self.__GetMessageByClient,args=[Cons])
         send = Thread(target=self.__SendMessageByClient)
@@ -237,6 +265,11 @@ class reseau:
         """
         return(self.ip,self.port)
 
+    def GetIpLocal(self):
+        """
+        retourne l'ip local
+        """
+        return self.ip
     
 
 if __name__ == "__main__":
@@ -245,6 +278,6 @@ if __name__ == "__main__":
 
     etat = input("Voulez vous etre Host ou Client (H/C)")
     if etat == "H":
-        test.HostMessagerie("172.20.10.2",5415,True)
+        test.HostMessagerie(6300,True)
     else:
-        test.ClientMessagerie("172.20.10.6",6300,True)
+        test.ClientMessagerie("172.20.10.2",6300,True)
