@@ -2,9 +2,6 @@ import socket
 from threading import Thread #Permet de faire tourner des fonctions en meme temps (async)
 import time
 
-
-
-
 class reseau:
     """
     Class reseau demandant 1 paramètre :
