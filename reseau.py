@@ -11,7 +11,7 @@ class reseau:
     def __init__(self, sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM), pseudo="User"):
         self.sock = sock
         self.serveurstart = False
-        self.DicoClient = {} #Liste de tout les clients
+        self.DicoClient = {} #Liste de tout les clients ex: {123.456.10.2={« pseudo »:  « banban », « client »:<fonction>}}
         self.pseudo = pseudo
         self.waitmessage = []
         self.chat = {0:0}
@@ -168,8 +168,11 @@ class reseau:
                         self.DicoClient.pop(cle)
                         client.close()
 
-            elif requete_client_decode == "GETIP":
-                pass
+            elif message[:3] == "/ip":
+                ippseudo=message.split(" ")
+                for cle,element in self.DicoClient.items():
+                    if element["pseudo"] == ippseudo[1]:
+                        self.SendMessage(cle)
 
             elif pseudo == "CARTEID":
                 #Recuperation des deux infos dans le texte
@@ -276,4 +279,4 @@ if __name__ == "__main__":
     if etat == "H":
         test.HostMessagerie(6300,True)
     else:
-        test.ClientMessagerie("192.168.15.214",6300,True)
+        test.ClientMessagerie("172.20.10.4",6300,True)
