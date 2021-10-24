@@ -116,7 +116,6 @@ class ContentFrame(Frame):
 
     def update_message_server(self):
         while self.msgStart:
-            print('update_message_server')
             time.sleep(1)
             new_msgs = False
             msg = self.master.network.FetchMessage()

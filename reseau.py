@@ -74,10 +74,9 @@ class reseau:
 
     def CloseClient(self, host_online=True):
         if host_online:
-            msg = ("§STOPCLIENT§")
+            msg = (f"{self.pseudo}§STOPCLIENT§")
             codemsg = msg.encode("utf-8")
             self.sock.send(codemsg)
-            self.__AddMessageInfo(f"⭕ {self.pseudo} s'est déconnecté")
             time.sleep(1)
         self.serveurstart = False
         self.chat = {0:0}
@@ -193,10 +192,11 @@ class reseau:
         for pseudo, message in zip(pseudoList, msgList):
             
             if message == "STOPCLIENT":
-                for cle,element in self.DicoClient.items():
+                for cle,element in self.DicoClient.copy().items():
                     if element["client"] == client:
                         self.DicoClient.pop(cle)
                         client.close()
+                self.__AddMessageInfo(f"⭕ {pseudo} s'est déconnecté")
 
             elif message[:3] == "/ip":
                 ippseudo=message.split(" ")
