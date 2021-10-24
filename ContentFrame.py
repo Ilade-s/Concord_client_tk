@@ -49,6 +49,10 @@ class ContentFrame(Frame):
     def stop_update(self):
         self.msgStart = False
     
+    def reset_frame(self):
+        self.msgList = []
+        self.render_msgs()
+    
     def show_last_msg(self):
         """
         render_msgs which go to the last messages
@@ -112,16 +116,27 @@ class ContentFrame(Frame):
 
     def update_message_server(self):
         while self.msgStart:
+            print('update_message_server')
             time.sleep(1)
             new_msgs = False
             msg = self.master.network.FetchMessage()
             for cle, element in msg.copy().items():
                 if cle > len([msg for msg in self.msgList if msg['distant']]):
-                    if element['distant']:
+                    if element['error']:
+                        if element['error'] == 'DISCONNECTED':
+                            msgbox.showerror('Déconnexion', "Vous avez été déconnecté.\tLe client va redémarrer...")
+                            self.stop_update()
+                            self.master.log = None
+                            self.master.network.CloseClient(False)
+                            self.reset_frame()
+                            self.master.navBar.infoFrame.reset()
+                            self.master.Menu.show_connect_menu()
+                            return 0
+                    elif element['distant']:
                         self.msgList.append(element)
                         self.master.log.add_message(element)
                         new_msgs = True
-                        if element['pseudo'] not in self.member_list:
+                        if element['pseudo'] not in self.member_list and element['pseudo'] != 'INFO!':
                             self.member_list.append(element['pseudo'])
                             self.master.log.add_member(element['pseudo'])
             if new_msgs: self.render_msgs()

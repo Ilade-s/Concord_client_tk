@@ -51,6 +51,7 @@ class EventFrame(LabelFrame):
                 self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
                 self.master.master.navBar.infoFrame.update_connexionLabel(target_ip, False)
                 self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
+                self.master.master.Menu.hide_connect_menu()
                 self.destroy()
             except Exception as e:
                 print(f"Echec de la connexion à l'adresse {target_ip}")
@@ -71,8 +72,10 @@ class EventFrame(LabelFrame):
               ).grid(row=2, column=0, padx=10, pady=10, sticky="w")
         portBox = ttk.Spinbox(self, width=30, background=self["background"], from_=1, to=50000, increment=1.0)
         portBox.set(6300)
-        ttk.Button(self, text="connect", command=partial(login_attempt, ip, portBox, pseudo), width=20
+        ttk.Button(self, text="Connect", command=partial(login_attempt, ip, portBox, pseudo), width=20
                    ).grid(row=3, column=1, padx=10, pady=10)
+        ttk.Button(self, text="Cancel", command=self.destroy, width=20
+                   ).grid(row=3, column=0, padx=10, pady=10)
         idEntry = ttk.Entry(self, textvariable=ip, width=30,
                             background=self["background"])
         pseudoEntry = ttk.Entry(self, textvariable=pseudo,
@@ -85,20 +88,21 @@ class EventFrame(LabelFrame):
         def login_attempt(port, pseudo):
             port = int(port.get())
             pseudo = pseudo.get()
-            try:
-                self.master.master.pseudo = pseudo
-                self.master.master.network.ChangePseudo(pseudo)
-                self.master.master.network.HostMessagerie(port)
+            #try:
+            self.master.master.pseudo = pseudo
+            self.master.master.network.ChangePseudo(pseudo)
+            self.master.master.network.HostMessagerie(port)
 
-                self.master.master.log = LogHandler(pseudo, True) # create log file
-                self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
-                self.master.master.navBar.infoFrame.update_connexionLabel(self.master.master.network.GetIpLocal(), True)
-                self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
-                self.destroy()
-            except Exception as e:
-                print(f"Echec du hosting")
-                msgbox.showerror(
-                    "login Serveur", f"Echec du hosting, veuillez réessayer : {e}")
+            self.master.master.log = LogHandler(pseudo, True) # create log file
+            self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
+            self.master.master.navBar.infoFrame.update_connexionLabel(self.master.master.network.GetIpLocal(), True)
+            self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
+            self.master.master.Menu.hide_connect_menu()
+            self.destroy()
+            #except Exception as e:
+            #    print(f"Echec du hosting")
+            #    msgbox.showerror(
+            #        "login Serveur", f"Echec du hosting, veuillez réessayer : {e}")
 
         self["text"] = "Création de salle"
         pseudo = StringVar()
@@ -110,8 +114,10 @@ class EventFrame(LabelFrame):
               ).grid(row=1, column=0, padx=10, pady=10, sticky="w")
         portBox = ttk.Spinbox(self, width=30, background=self["background"], from_=1, to=50000, increment=1.0)
         portBox.set(6300)
-        ttk.Button(self, text="create", command=partial(login_attempt, portBox, pseudo), width=20
+        ttk.Button(self, text="Create", command=partial(login_attempt, portBox, pseudo), width=20
                    ).grid(row=2, column=1, padx=10, pady=10)
+        ttk.Button(self, text="Cancel", command=self.destroy, width=20
+                   ).grid(row=2, column=0, padx=10, pady=10)
         pseudoEntry = ttk.Entry(self, textvariable=pseudo,
                         width=30, background=self["background"])
         portBox.grid(row=0, column=1, padx=10, pady=10)

@@ -33,6 +33,12 @@ class MenuBar(Menu):
         connectMenu.add_command(
             label="Join room as guest...", command=self.join_room)
     
+    def hide_connect_menu(self):
+        self.entryconfig("Connect", state=DISABLED)
+    
+    def show_connect_menu(self):
+        self.entryconfig("Connect", state=NORMAL)
+    
     def create_room(self):
         if self.eventFrame: self.eventFrame.destroy()
         self.eventFrame = EventFrame(self.master.contentFrame, 'host', True)

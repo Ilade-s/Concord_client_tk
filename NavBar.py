@@ -63,6 +63,10 @@ class InfoFrame(LabelFrame):
         """
         self.connexionStatusLabel['text'] = f'Connexion : {ip} ' + ('(host)' if ashost else '(client)')
     
+    def reset(self):
+        for c in self.winfo_children():
+            c.destroy()
+        self.__create_widgets()
 
 class InputFrame(Frame):
 

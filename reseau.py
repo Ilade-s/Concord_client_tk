@@ -45,13 +45,18 @@ class reseau:
         """
 
         while self.serveurstart:
-            new_client, ip = self.sock.accept()
+            try:    
+                new_client, ip = self.sock.accept()
+            except Exception:
+                self.__Disconnected_toInterface()
+                return 0
             GetMessage = Thread(target=self.__GetMessageOfClient,args=(new_client,Cons))
             GetMessage.start()
             if Cons: print(f"Connexion : > {ip}")
 
-        if Cons: print("Fermeture port")
-        self.CloseBind()
+        if Cons: 
+            print("Fermeture port")
+            self.CloseBind()
 
     def CloseBind(self):
         """
@@ -62,25 +67,27 @@ class reseau:
         self.__AddMessageInfo("⚠️ *WARNING* | L'hote vient de fermer la session.")
         time.sleep(1)
         self.serveurstart = False
-        time.sleep(1)
-        for cle,element in self.DicoClient.items():
+        for element in self.DicoClient.values():
             element["client"].close()
-            self.DicoClient.pop(cle)
+        self.DicoClient = {}
         self.sock.close()
 
-    def CloseClient(self):
-        msg = ("§STOPCLIENT§")
-        codemsg = msg.encode("utf-8")
-        self.sock.send(codemsg)
-        self.__AddMessageInfo(f"⭕ {self.pseudo} s'est déconnecté")
-        time.sleep(1)
+    def CloseClient(self, host_online=True):
+        if host_online:
+            msg = ("§STOPCLIENT§")
+            codemsg = msg.encode("utf-8")
+            self.sock.send(codemsg)
+            self.__AddMessageInfo(f"⭕ {self.pseudo} s'est déconnecté")
+            time.sleep(1)
         self.serveurstart = False
+        self.chat = {0:0}
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     
     def __AddMessageInfo(self,message):
         ID = self.chat[0]+1
         TIME = time.strftime('%H:%M', time.localtime())
         self.chat[0] = ID
-        self.chat[ID] = {"pseudo":"INFO","time":TIME,"content":message, 'distant': True, 'info': True}
+        self.chat[ID] = {"pseudo":"INFO","time":TIME,"content":message, 'distant': True, 'info': True, 'error': ''}
 
         msg = f"INFO!§{message}§"
         codemsg = msg.encode("utf-8")
@@ -134,10 +141,23 @@ class reseau:
                 print("stop client envoye")
             else:
                 self.SendMessage(envoie,True)
+    
+    def __Disconnected_toInterface(self):
+        """sub func called in case __GetMessage fails to fetch the socket
+        will add a info message to self.chat to make the interface aware of the deconnection"""
+        ID = self.chat[0]+1
+        self.chat[0] = ID
+        self.chat[ID] = {
+            'error': 'DISCONNECTED'
+            }
 
     def __GetMessageByClient(self,Cons=False):
         while self.serveurstart:
-            requete_server = self.sock.recv(500)
+            try:
+                requete_server = self.sock.recv(500)
+            except Exception:
+                self.__Disconnected_toInterface()
+                return 0
             requete_server = requete_server.decode("utf-8")
             a = requete_server.split("§")
             pseudoList = [a[i] for i in range(0, len(a), 2)]
@@ -149,11 +169,21 @@ class reseau:
                     ID = self.chat[0]+1
                     TIME = time.strftime('%H:%M', time.localtime())
                     self.chat[0] = ID
-                    self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True, 'info': False}
+                    self.chat[ID] = {
+                        "pseudo":pseudo,
+                        "time":TIME,
+                        "content":message,
+                        'distant': True,
+                        'info': False,
+                        'error': ''
+                        }
                     if Cons: print(f"{pseudo} >> {message}")
 
     def __GetMessageOfClient(self,client,Cons=False):
-        requete_client = client.recv(500) #Recuperation des messages
+        try:    
+            requete_client = client.recv(500) #Recuperation des messages
+        except Exception:
+            return 0
         requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8
 
         #Stockage du message
@@ -185,7 +215,7 @@ class reseau:
                 ID = self.chat[0]+1
                 TIME = time.strftime('%H:%M', time.localtime())
                 self.chat[0] = ID
-                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True, 'info': False}
+                self.chat[ID] = {"pseudo":pseudo,"time":TIME,"content":message, 'distant': True, 'info': False, 'error': ''}
                 if Cons: print(f"{pseudo} >> {message}")
                 #Envoie du message vers les autres client !
                 for element in self.DicoClient:
@@ -237,7 +267,7 @@ class reseau:
         """
         Retourne un dictionnaire contenant tout les messages reçus.
             - dico[0] = total de message
-            - dico[1 à dico[0]] = {'pseudo':''User, 'time': 'hh:mm', 'content' : 'Hey'}
+            - dico[1 à dico[0]] = {'pseudo':''User, 'time': 'hh:mm', 'content' : 'Hey', 'info': bool, 'error': str (vide si pas d'erreur, sinon donne type)}
         [INFO] : La fonction ne retourne pas les propres message de l'utilisateur
         """
         return self.chat
