@@ -92,6 +92,15 @@ class reseau:
         codemsg = msg.encode("utf-8")
         for element in self.DicoClient:
             self.DicoClient[element]["client"].send(codemsg)
+    
+    def send_info_img_msg(self, name, y_size):
+        """
+        Sends info msg for an image
+            - y_size is the height in pixels of the image, will be used to know how much messages needs to be recieved before converting back the image
+        """
+        msg = (f"{self.pseudo}§IMGINFO§{name}§{y_size}")
+        codemsg = msg.encode("utf-8")
+        self.sock.send(codemsg)
 
     def __SendMessageByHote(self):
         while self.serveurstart:
@@ -153,7 +162,7 @@ class reseau:
     def __GetMessageByClient(self,Cons=False):
         while self.serveurstart:
             try:
-                requete_server = self.sock.recv(500)
+                requete_server = self.sock.recv(10**6)
             except Exception:
                 self.__Disconnected_toInterface()
                 return 0
@@ -180,7 +189,7 @@ class reseau:
 
     def __GetMessageOfClient(self,client,Cons=False):
         try:    
-            requete_client = client.recv(500) #Recuperation des messages
+            requete_client = client.recv(10**6) #Recuperation des messages
         except Exception:
             return 0
         requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8

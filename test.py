@@ -1,7 +1,8 @@
+from tkinter.constants import N
 
-DicoClient = {"145641231":{"pseudo":"ok","client":"fonction"}}
-client="fonction"
-for cle,element in DicoClient.items():
-    print(element)
-    if element["client"] == client:
-        print("je pop "+cle)
+
+a = 'IMG%LINE%^0^ (Personnalisé)%4-2,5,3-2,6,4-c2'
+
+(name, line) = a.split('%')[2:]
+
+print(name, line)

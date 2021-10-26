@@ -88,21 +88,21 @@ class EventFrame(LabelFrame):
         def login_attempt(port, pseudo):
             port = int(port.get())
             pseudo = pseudo.get()
-            #try:
-            self.master.master.pseudo = pseudo
-            self.master.master.network.ChangePseudo(pseudo)
-            self.master.master.network.HostMessagerie(port)
+            try:
+                self.master.master.pseudo = pseudo
+                self.master.master.network.ChangePseudo(pseudo)
+                self.master.master.network.HostMessagerie(port)
 
-            self.master.master.log = LogHandler(pseudo, True) # create log file
-            self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
-            self.master.master.navBar.infoFrame.update_connexionLabel(self.master.master.network.GetIpLocal(), True)
-            self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
-            self.master.master.Menu.hide_connect_menu()
-            self.destroy()
-            #except Exception as e:
-            #    print(f"Echec du hosting")
-            #    msgbox.showerror(
-            #        "login Serveur", f"Echec du hosting, veuillez réessayer : {e}")
+                self.master.master.log = LogHandler(pseudo, True) # create log file
+                self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
+                self.master.master.navBar.infoFrame.update_connexionLabel(self.master.master.network.GetIpLocal(), True)
+                self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
+                self.master.master.Menu.hide_connect_menu()
+                self.destroy()
+            except Exception as e:
+                print(f"Echec du hosting")
+                msgbox.showerror(
+                    "login Serveur", f"Echec du hosting, veuillez réessayer : {e}")
 
         self["text"] = "Création de salle"
         pseudo = StringVar()

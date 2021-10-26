@@ -8,6 +8,7 @@ from tkinter import ttk
 from EventFrame import *
 import time
 from threading import Thread #Permet de faire tourner des fonctions en meme temps (async)
+from imgHandler import ImgReceiving, make_img_path, os
 
 defaultMessage = {
     'pseudo': 'Pedro',
@@ -30,8 +31,10 @@ class ContentFrame(Frame):
         self.place(relx=0, rely=0, relheight=.8, relwidth=1)
         #self.eventFrame = EventFrame(self)
         self.msgList = []
+        self.allmsgList = []
         self.rendered_msgs = []
         self.member_list = []
+        self.img_to_receive = {}
         self.msgIndex = 0
         #self.__debug_setup()
         self.msgStart = False
@@ -92,9 +95,14 @@ class ContentFrame(Frame):
         msgs_to_render = self.msgList[self.msgIndex:self.msgIndex + nMsgs_renderable]
 
         for msg in msgs_to_render:
-            msgc = msg.copy()
-            msgc['content'] = format_content(msgc['content'], self.get_maxCarac())
-            self.rendered_msgs.append(MessageTemplate(self, msgc))
+            if 'img' not in msg.keys(): # text message
+                msgc = msg.copy()
+                msgc['content'] = format_content(msgc['content'], self.get_maxCarac())
+                self.rendered_msgs.append(MessageTemplate(self, msgc))
+            else: # image message
+                img_path = msg['img'] if os.path.exists(msg['img']) else make_img_path(msg['img'])
+                self.rendered_msgs.append(ImageTemplate(self, msg, img_path))
+
         
         self.master.navBar.infoFrame.update_renderLabel(self.msgIndex + 1, len(msgs_to_render) - 1)
 
@@ -118,9 +126,10 @@ class ContentFrame(Frame):
         while self.msgStart:
             time.sleep(1)
             new_msgs = False
+            new_img = False
             msg = self.master.network.FetchMessage()
             for cle, element in msg.copy().items():
-                if cle > len([msg for msg in self.msgList if msg['distant']]):
+                if cle > len([msg for msg in self.allmsgList if msg['distant']]):
                     if element['error']:
                         if element['error'] == 'DISCONNECTED':
                             msgbox.showerror('Déconnexion', "Vous avez été déconnecté.\tLe client va redémarrer...")
@@ -132,13 +141,40 @@ class ContentFrame(Frame):
                             self.master.Menu.show_connect_menu()
                             return 0
                     elif element['distant']:
-                        self.msgList.append(element)
-                        self.master.log.add_message(element)
-                        new_msgs = True
-                        if element['pseudo'] not in self.member_list and element['pseudo'] != 'INFO!':
-                            self.member_list.append(element['pseudo'])
-                            self.master.log.add_member(element['pseudo'])
-            if new_msgs: self.render_msgs()
+                        if 'IMG%' in element['content']: # img msg (info or part)
+                            print(element['content'])
+                            msg_type = element['content'].split('%')[1]
+                            if msg_type == 'INFO': # image infos
+                                name = element['content'].split('%')[2]
+                                len_img = element['content'].split('%')[3]
+                                self.img_to_receive[name] = ImgReceiving(name, len_img)
+                            elif msg_type == 'END':
+                                name = element['content'].split('%')[2]
+                                self.img_to_receive[name].save_motifs()
+                                self.img_to_receive[name].save_conversion()
+                                element['content'] = name
+                                element['img'] = name
+                                # convert then show the image
+                                self.img_to_receive[name].retrieve_img_from_CSV()
+                                self.msgList.append(element)
+                                new_img = True
+                            elif msg_type == 'LINE': # part of an image
+                                (name, line) = element['content'].split('%')[2:]
+                                self.img_to_receive[name].add_line(line)
+                            elif msg_type == 'MOTIF': # part of an image
+                                (name, line) = element['content'].split('%')[2:]
+                                self.img_to_receive[name].add_motif(line)
+                        else:
+                            self.msgList.append(element)
+                            self.master.log.add_message(element)
+                            new_msgs = True
+                            if element['pseudo'] not in self.member_list and element['pseudo'] != 'INFO!':
+                                self.member_list.append(element['pseudo'])
+                                self.master.log.add_member(element['pseudo'])
+                        self.allmsgList.append(element)
+
+            if new_msgs and (len(self.msgList) - self.msgIndex < self.get_maxAff() or new_img):
+                self.render_msgs()
 
 class MessageTemplate(LabelFrame):
 
@@ -154,6 +190,39 @@ class MessageTemplate(LabelFrame):
         # ajout texte
         msgLabel = ttk.Label(self, text=message['content'], style="Message.TLabel"
             , background='#292D3E', foreground='white')
+        msgLabel.pack(padx=5, pady=2)
+        # configure style
+        s = ttk.Style(self)
+        s.configure("Message.TLabel", font=("Arial", fontSize))
+        # find good anchor
+        if message['info']:
+            anchor = CENTER
+            msgLabel['background'] = 'white'
+            msgLabel['foreground'] = 'black'
+            self['background'] = 'white'
+            self['foreground'] = 'black'
+            self['text'] = 'INFORMATION'
+        elif message['distant']:
+            anchor = "nw"
+        else:
+            anchor = "ne"
+        self.pack(anchor=anchor, padx=5)
+
+class ImageTemplate(LabelFrame):
+
+    def __init__(self, master, message, image_path, fontSize=12) -> None:
+        """
+        Crée et packe un message dans master (ContentFrame)
+        message : dictionnaire qui contient toutes les informations sur le message
+        """
+        super().__init__(master, background=master['background'], 
+                        text=f"{message['pseudo']} ({message['time']})" if message['distant'] 
+                            else f"{message['pseudo']} (You) ({message['time']})",
+                        relief=RAISED, foreground='white')
+        # ajout texte
+        self.img = PhotoImage(file=image_path)
+        msgLabel = ttk.Label(self, text=message['content'], style="Message.TLabel"
+            ,image=self.img , background='#292D3E', foreground='white')
         msgLabel.pack(padx=5, pady=2)
         # configure style
         s = ttk.Style(self)
