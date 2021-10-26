@@ -173,7 +173,7 @@ class ContentFrame(Frame):
                                 self.master.log.add_member(element['pseudo'])
                         self.allmsgList.append(element)
 
-            if new_msgs and (len(self.msgList) - self.msgIndex < self.get_maxAff() or new_img):
+            if (new_msgs and len(self.msgList) - self.msgIndex < self.get_maxAff()) or new_img:
                 self.render_msgs()
 
 class MessageTemplate(LabelFrame):

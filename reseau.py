@@ -189,7 +189,7 @@ class reseau:
 
     def __GetMessageOfClient(self,client,Cons=False):
         try:    
-            requete_client = client.recv(10**6) #Recuperation des messages
+            requete_client = client.recv(10**7) #Recuperation des messages
         except Exception:
             return 0
         requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8
