@@ -64,7 +64,7 @@ class reseau:
 
         [ATTENTION] Ne pas lancer la fonction en tant que client (non hote)
         """
-        self.__AddMessageInfo("⚠️ *WARNING* | L'hote vient de fermer la session.")
+        self.__AddMessageInfo("*WARNING* | L'hote vient de fermer la session.")
         time.sleep(1)
         self.serveurstart = False
         for element in self.DicoClient.values():
@@ -162,7 +162,7 @@ class reseau:
     def __GetMessageByClient(self,Cons=False):
         while self.serveurstart:
             try:
-                requete_server = self.sock.recv(10**6)
+                requete_server = self.sock.recv(10**7)
             except Exception:
                 self.__Disconnected_toInterface()
                 return 0
@@ -205,7 +205,7 @@ class reseau:
                     if element["client"] == client:
                         self.DicoClient.pop(cle)
                         client.close()
-                self.__AddMessageInfo(f"⭕ {pseudo} s'est déconnecté")
+                self.__AddMessageInfo(f"{pseudo} s'est déconnecté")
 
             elif message[:3] == "/ip":
                 ippseudo=message.split(" ")
@@ -218,7 +218,7 @@ class reseau:
                 psd,ip = message.split("|")
                 self.DicoClient[ip] = {"pseudo":psd,"client":client}
                 #Envoie d'un message a titre INFORMATIF
-                self.__AddMessageInfo(f"🟢 {psd} vient de se connecter")
+                self.__AddMessageInfo(f"{psd} vient de se connecter")
             
             else:
                 ID = self.chat[0]+1

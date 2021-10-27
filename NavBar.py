@@ -8,6 +8,7 @@ from tkinter import ttk, filedialog as fldial, messagebox as msgbox
 from datetime import datetime
 import os
 from imgHandler import *
+from time import sleep
 
 class NavBar(LabelFrame):
 
@@ -128,11 +129,15 @@ class InputFrame(Frame):
                     line_str = ','.join(line)
                     #print(f'IMG%LINE%{name}%{line_str}')
                     self.master.master.network.SendMessage(f'IMG%LINE%{name}%{line_str}')
+                    #sleep(.02)
                 # sends each line of the motifs
-                for line, i in zip(get_motifs(motifs_path), range(len_img)):
-                    print(f'sending motif {i+1}')
+                i = 0
+                for line in get_motifs(motifs_path):
+                    i += 1
+                    print(f'sending motif {i}')
                     line_str = ','.join(line)
                     self.master.master.network.SendMessage(f'IMG%MOTIF%{name}%{line_str}')
+                    #sleep(.02)
                 # send end message to confirm end of data sending
                 self.master.master.network.SendMessage(f'IMG%END%{name}')
             except Exception as e:
