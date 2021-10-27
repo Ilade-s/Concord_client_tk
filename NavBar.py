@@ -117,7 +117,7 @@ class InputFrame(Frame):
             self.master.master.contentFrame.set_new_msg(msgDict)
             try:
                 csv_folder_path = 'img/' + name + '/'              
-                if not os.path.exists(csv_folder_path): os.mkdir(csv_folder_path)
+                if not os.path.exists(csv_folder_path): os.makedirs(csv_folder_path)
                 (csv_path, motifs_path) = convert_image(path, 32, csv_folder_path)
                 len_img = get_len_img(path)
                 # send info message

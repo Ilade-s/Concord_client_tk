@@ -204,7 +204,7 @@ class ImgReceiving:
             w.writerows(self.motifs)
     
     def save_conversion(self):
-        if not os.path.exists(self.folder): os.mkdir(self.folder)
+        if not os.path.exists(self.folder): os.makedirs(self.folder)
         with open(self.folder + 'convert.csv', "w+", newline='\n') as convertFile:
             w = csv.writer(convertFile)
             w.writerows(self.conversion)
