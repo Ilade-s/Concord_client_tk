@@ -143,8 +143,8 @@ class InputFrame(Frame):
         msg.set('new message...')
 
         self.imgIcon = PhotoImage(file="assets/img_icon.png")
-        ttk.Button(self, text='envoyer une image', image=self.imgIcon, command=send_image
-            ).place(relx=.025, rely=.1)
+        self.imgBtn = ttk.Button(self, text='envoyer une image', image=self.imgIcon, command=send_image, state=DISABLED)
+        self.imgBtn.place(relx=.025, rely=.1)
 
         MsgLabel = Entry(self, textvariable=msg, background='#A8B8FF', font=("Arial", 15))
         MsgLabel.place(relx=.175, rely=.1, relwidth=.9, relheight=.8, anchor='nw')

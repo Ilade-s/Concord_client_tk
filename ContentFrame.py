@@ -139,6 +139,7 @@ class ContentFrame(Frame):
                             self.reset_frame()
                             self.master.navBar.infoFrame.reset()
                             self.master.Menu.show_connect_menu()
+                            self.master.navBar.inputFrame.imgBtn['state'] = DISABLED
                             return 0
                     elif element['distant']:
                         if 'IMG%' in element['content']: # img msg (info or part)

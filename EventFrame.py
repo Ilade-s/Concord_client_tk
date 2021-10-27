@@ -50,6 +50,7 @@ class EventFrame(LabelFrame):
                 self.master.master.log = LogHandler(pseudo, False) # create log file
                 self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
                 self.master.master.navBar.infoFrame.update_connexionLabel(target_ip, False)
+                self.master.master.navBar.inputFrame.imgBtn['state'] = NORMAL
                 self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
                 self.master.master.Menu.hide_connect_menu()
                 self.destroy()
@@ -96,6 +97,7 @@ class EventFrame(LabelFrame):
                 self.master.master.log = LogHandler(pseudo, True) # create log file
                 self.master.master.navBar.infoFrame.update_logLabel(self.master.master.log.get_path())
                 self.master.master.navBar.infoFrame.update_connexionLabel(self.master.master.network.GetIpLocal(), True)
+                self.master.master.navBar.inputFrame.imgBtn['state'] = NORMAL
                 self.master.master.contentFrame.setup_join() # setup content frame for network dicussion
                 self.master.master.Menu.hide_connect_menu()
                 self.destroy()
