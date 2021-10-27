@@ -106,7 +106,7 @@ class InputFrame(Frame):
         
         def send_image():
             path = fldial.askopenfilename(initialdir=os.getcwd(), title="Image to compress...")
-            name = path.split('/')[-1].split('.')[0]
+            name = path.split('/')[-1].split('.')[0][:10]
             msgDict = {
                 'pseudo': self.master.master.pseudo,
                 'time': datetime.now().strftime('%H:%M'), # current time (format HH:MM)
