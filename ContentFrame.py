@@ -9,6 +9,7 @@ from EventFrame import *
 import time
 from threading import Thread #Permet de faire tourner des fonctions en meme temps (async)
 from imgHandler import ImgReceiving, make_img_path, os
+from PIL import Image, ImageTk
 
 defaultMessage = {
     'pseudo': 'Pedro',
@@ -221,7 +222,8 @@ class ImageTemplate(LabelFrame):
                             else f"{message['pseudo']} (You) ({message['time']})",
                         relief=RAISED, foreground='white')
         # ajout texte
-        self.img = PhotoImage(file=image_path)
+        image = Image.open(image_path)
+        self.img = ImageTk.PhotoImage(image)
         msgLabel = ttk.Label(self, text=message['content'], style="Message.TLabel"
             ,image=self.img , background='#292D3E', foreground='white')
         msgLabel.pack(padx=5, pady=2)
