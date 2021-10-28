@@ -17,6 +17,7 @@ class reseau:
         self.chat = {0:0}
         self.ip = socket.gethostbyname(socket.gethostname())
         self.port = 0
+        self.req_incomplete = ()
 
     def __bind(self,Host,Port, Cons=False):
         """
@@ -92,15 +93,6 @@ class reseau:
         codemsg = msg.encode("utf-8")
         for element in self.DicoClient:
             self.DicoClient[element]["client"].send(codemsg)
-    
-    def send_info_img_msg(self, name, y_size):
-        """
-        Sends info msg for an image
-            - y_size is the height in pixels of the image, will be used to know how much messages needs to be recieved before converting back the image
-        """
-        msg = (f"{self.pseudo}§IMGINFO§{name}§{y_size}")
-        codemsg = msg.encode("utf-8")
-        self.sock.send(codemsg)
 
     def __SendMessageByHote(self):
         while self.serveurstart:
@@ -189,13 +181,35 @@ class reseau:
 
     def __GetMessageOfClient(self,client,Cons=False):
         try:    
-            requete_client = client.recv(10**7) #Recuperation des messages
+            requete_client = client.recv(10**5) #Recuperation des messages
         except Exception:
             return 0
-        requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8
-
+        requete_client_decode = requete_client.decode('utf-8') #Passage en UTF-8 
         #Stockage du message
         a = requete_client_decode.split("§")
+        # vérif si message incomplet à la requête précédente
+        if self.req_incomplete:
+            (type, part) = self.req_incomplete
+            if type == 'MSG': # need to add pseudo and concatenate msg part
+                a[0] = part.split('§')[1] + a[0]
+                a.insert(0, part.split('§')[0])
+            elif type == 'NAME': # only need to concatenate pseudo part
+                a[0] = part + a[0]
+            msg = '§'.join(a[:2])
+            print(f'completed msg : {msg}')
+        # vérif si message incomplet à cette requête
+        if a[-1]: # message incomplet
+            if (len(a) - 1) % 2: # pseudo complet et message incomplet (= 1 donc index impair)
+                msg = '§'.join(a[-2:])
+                print(f'incomplete msg : {msg}')
+                self.req_incomplete = ('MSG', msg)
+                a = a[:-2]
+            else: # pseudo incomplet et msg manquant (= 0 donc index pair)
+                msg = a[-1]
+                print(f'incomplete msg : {msg}')
+                self.req_incomplete = ('NAME', msg)
+                a = a[:-1]
+
         pseudoList = [a[i] for i in range(0, len(a), 2)]
         msgList = [a[i] for i in range(1, len(a), 2)]
         for pseudo, message in zip(pseudoList, msgList):
@@ -259,7 +273,7 @@ class reseau:
         self.__ConnexionMessagerie(Host,Port,Cons) #Ouverture de la connexion vers l'hote
 
         #Envoie cart identite vers le HOST
-        carte = f"CARTEID§{self.pseudo}|{self.ip}"
+        carte = f"CARTEID§{self.pseudo}|{self.ip}§"
         codemsg = carte.encode("utf-8")
         self.sock.send(codemsg)
 

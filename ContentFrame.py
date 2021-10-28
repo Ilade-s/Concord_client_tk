@@ -144,7 +144,7 @@ class ContentFrame(Frame):
                             return 0
                     elif element['distant']:
                         if 'IMG%' in element['content']: # img msg (info or part)
-                            print(element['content'])
+                            #print(element['content'])
                             msg_type = element['content'].split('%')[1]
                             if msg_type == 'INFO': # image infos
                                 name = element['content'].split('%')[2]
