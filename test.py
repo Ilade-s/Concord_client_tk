@@ -1,7 +1,6 @@
 from tkinter.constants import N
 
 
-b = ()
+b = ('IMG' , 'a-b-3d')
 
-if b:
-    print('b')
+print(True if b else False)
