@@ -170,21 +170,21 @@ class reseau:
                     a[0] = part + a[0]
                 msg = '§'.join(a[:2])
                 self.req_incomplete = ()
-                print(f'completed msg : {msg}')
+                #print(f'completed msg : {msg}')
             # vérif si message incomplet à cette requête
             if a[-1]: # message incomplet
-                print('before :', len(a))
                 if (len(a) - 1) % 2: # pseudo complet et message incomplet (= 1 donc index impair)
                     msg = f'{a[-2]}§{a[-1]}'
-                    print(f'incomplete msg : {msg}')
+                    #print(f'incomplete msg : {msg}')
                     self.req_incomplete = ('MSG', msg)
                     a = a[:-2]
                 else: # pseudo incomplet et msg manquant (= 0 donc index pair)
                     msg = a[-1]
-                    print(f'incomplete msg : {msg}')
+                    #print(f'incomplete msg : {msg}')
                     self.req_incomplete = ('NAME', msg)
                     a = a[:-1]
-                print('after :', len(a))
+            
+            print(self.req_incomplete)
 
             pseudoList = [a[i] for i in range(0, len(a), 2)]
             msgList = [a[i] for i in range(1, len(a), 2)]
@@ -223,21 +223,21 @@ class reseau:
                 a[0] = part + a[0]
             msg = '§'.join(a[:2])
             self.req_incomplete = ()
-            print(f'completed msg : {msg}')
+            #print(f'completed msg : {msg}')
         # vérif si message incomplet à cette requête
         if a[-1]: # message incomplet
-            print('before :', len(a))
             if (len(a) - 1) % 2: # pseudo complet et message incomplet (= 1 donc index impair)
                 msg = f'{a[-2]}§{a[-1]}'
-                print(f'incomplete msg : {msg}')
+                #print(f'incomplete msg : {msg}')
                 self.req_incomplete = ('MSG', msg)
                 a = a[:-2]
             else: # pseudo incomplet et msg manquant (= 0 donc index pair)
                 msg = a[-1]
-                print(f'incomplete msg : {msg}')
+                #print(f'incomplete msg : {msg}')
                 self.req_incomplete = ('NAME', msg)
                 a = a[:-1]
-            print('after :', len(a))
+        
+        print(self.req_incomplete)
 
         pseudoList = [a[i] for i in range(0, len(a), 2)]
         msgList = [a[i] for i in range(1, len(a), 2)]
