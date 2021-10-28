@@ -196,6 +196,7 @@ class reseau:
             elif type == 'NAME': # only need to concatenate pseudo part
                 a[0] = part + a[0]
             msg = '§'.join(a[:2])
+            self.req_incomplete = ()
             print(f'completed msg : {msg}')
         # vérif si message incomplet à cette requête
         if a[-1]: # message incomplet
